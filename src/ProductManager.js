@@ -1,4 +1,4 @@
-//modules importation
+//modules
 import fs from 'fs';
 
 //classes declaration
