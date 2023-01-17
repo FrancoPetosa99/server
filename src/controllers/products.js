@@ -56,4 +56,35 @@ router.get('/:id', async (request, response)=> {
     response.end(JSON.stringify(responseObj));
 });
 
+router.post('/', async (request, response)=> {
+    try{
+        const newProduct = request.body;
+        const id = await productManager.addProduct(newProduct);
+        response.json(201, `product with id ${id} was successfully added`);
+    }catch(error){
+        response.json(400, 'The following errors has occurred: ' + error.message);
+    }
+});
+
+router.put('/:id', async (request, response)=> {
+    try{
+        const productId = request.params.id;
+        const newData = request.body;
+        await productManager.updateProduct(productId, newData);
+        response.json(200, 'Product successfully updated');
+    }catch(error){
+        response.json(400, 'The following errors has occurred: ' + error.message);
+    }
+});
+
+router.delete('/:id', async (request, response)=> {
+    try{
+        const productId = request.params.id;
+        await productManager.deleteProduct(productId);
+        response.json(200, `Product with id ${productId} successfully deleted`);
+    }catch(error){
+        response.json(400, 'The following errors has occurred: ' + error.message);
+    }
+});
+
 export default router;
