@@ -1,7 +1,11 @@
-//modules
+/********************************************/
+//IMPORT MODULES
+/********************************************/
 import fs from 'fs';
 
-//classes declaration
+/********************************************/
+//CART MANAGER CLASS
+/********************************************/
 class CartManager{
 
     constructor(){
@@ -93,6 +97,9 @@ class CartManager{
     
 }
 
-export { CartManager }
+const cartManager = new CartManager(); //INITIALIZE THE CART MANAGER
+
+export default cartManager;
+
 
 

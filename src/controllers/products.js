@@ -1,11 +1,15 @@
+/********************************************/
+//IMPORT MODULES
+/********************************************/
 import { Router } from "express";
-import { ProductManager } from '../ProductManager.js';
+import { serverSocket } from "../index.js";
+import productManager from '../ProductManager.js';
 
+const router = Router(); //INITIALIZE ROUTER
 
-const router = Router();
-const productManager = new ProductManager();
-
-//end point GET products
+/********************************************/
+//GET METHOD ENDPOINTS
+/********************************************/
 router.get('/', async (request, response)=> {
 
     const responseObj = {};
@@ -35,7 +39,6 @@ router.get('/', async (request, response)=> {
 
 });
 
-//end point GET products by id
 router.get('/:id', async (request, response)=> {
 
     const responseObj = {};
@@ -56,16 +59,23 @@ router.get('/:id', async (request, response)=> {
     response.end(JSON.stringify(responseObj));
 });
 
+/********************************************/
+//POST METHOD ENDPOINTS
+/********************************************/
 router.post('/', async (request, response)=> {
     try{
         const newProduct = request.body;
         const id = await productManager.addProduct(newProduct);
         response.json(201, `product with id ${id} was successfully added`);
+        serverSocket.emit('product-added', newProduct);
     }catch(error){
         response.json(400, 'The following errors has occurred: ' + error.message);
     }
 });
 
+/********************************************/
+//PUT METHOD ENDPOINTS
+/********************************************/
 router.put('/:id', async (request, response)=> {
     try{
         const productId = request.params.id;
@@ -77,11 +87,15 @@ router.put('/:id', async (request, response)=> {
     }
 });
 
+/********************************************/
+//DELETE METHOD ENDPOINTS
+/********************************************/
 router.delete('/:id', async (request, response)=> {
     try{
         const productId = request.params.id;
         await productManager.deleteProduct(productId);
         response.json(200, `Product with id ${productId} successfully deleted`);
+        serverSocket.emit('product-deleted', productId);
     }catch(error){
         response.json(400, 'The following errors has occurred: ' + error.message);
     }

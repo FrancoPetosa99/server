@@ -1,5 +1,4 @@
 //modules
-import { error } from 'console';
 import fs from 'fs';
 //import fs from './products.json'
 //classes declaration
@@ -73,13 +72,11 @@ class ProductManager{
 
         const products = await this.getProducts();
 
-        const product = products.find(product => product.id === id);
+        const product = products.find(product => product.id == id);
 
-        if(product){
-            return product
-        }else{
-            console.error(`The product with id ${id} could not be found`)
-        }
+        if(!product) throw new Error(`The product with id ${id} could not be found`);
+
+        return product;
 
     }
 
@@ -157,6 +154,7 @@ class ProductManager{
     
 }
 
-export { ProductManager }
+const productManager = new ProductManager();
+export default productManager;
 
 

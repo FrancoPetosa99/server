@@ -1,10 +1,14 @@
+/********************************************/
+//IMPORT MODULES
+/********************************************/
 import { Router } from "express";
-import { CartManager } from "../CartManager.js";
+import cartManager from "../CartManager.js";
 
-const router = Router();
-const cartManager = new CartManager();
+const router = Router(); //INITIALIZE ROUTER
 
-//end point GET cart by Id
+/********************************************/
+//GET METHOD ENDPOINTS
+/********************************************/
 router.get('/:cid', async (request, response)=> {
     try{
         const cartId = request.params.cid;
@@ -15,7 +19,9 @@ router.get('/:cid', async (request, response)=> {
     }
 });
 
-//end point POST carts
+/********************************************/
+//POST METHOD ENDPOINTS
+/********************************************/
 router.post('/', async (request, response)=> {
     try{
         await cartManager.addCart();
@@ -25,7 +31,6 @@ router.post('/', async (request, response)=> {
     }
 });
 
-//end point POST add product Id to cart by Id
 router.post('/:cid/product/:pid', async (request, response)=> {
     try{
         const cartId = request.params.cid;
