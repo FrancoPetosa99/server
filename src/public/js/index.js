@@ -16,41 +16,15 @@ socket.emit('EVENT NAME',  'CLIENT MESSAGE TO SERVER');
 //CONFIGURABLE SERVER LISTENERS
 /********************************************/
 socket.on('product-added', product => {
-    console.log('New Product Available: ' + product);
     const card = ui.buildProductCard(product);
     const container = document.querySelector('.container-cards-products');
     container.appendChild(card);
-    Swal.fire({
-        toast: true,
-        text: 'New product available',
-        position: 'bottom-end',
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 4500,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-    });
+    ui.displayAlert('success', `New ${product.title} added`);
 });
 
 socket.on('product-deleted', productId => {
-    console.log('funciona');
     ui.removeProductCard(productId);
-    Swal.fire({
-        toast: true,
-        text: 'Product deleted',
-        position: 'bottom-end',
-        icon: 'error',
-        showConfirmButton: false,
-        timer: 4500,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-    });
+    ui.displayAlert('error', `Product with id: ${productId} deleted`);
 });
 
 socket.on('EVENT NAME', data => {

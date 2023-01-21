@@ -19,16 +19,33 @@ function UI(){
     }
 
     function removeProductCard(productId){
-        console.log(productId + 1);
+        
         const card = document.querySelector(`[product-card = product-${productId}]`);
         const parent = card.parentNode;
         parent.removeChild(card);
         
     }
 
+    function displayAlert(type, message){
+        Swal.fire({
+            toast: true,
+            text: message,
+            position: 'bottom-end',
+            icon: type,
+            showConfirmButton: false,
+            timer: 4500,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+    }
+
     return {
         buildProductCard,
-        removeProductCard
+        removeProductCard,
+        displayAlert
     }
 }
 
