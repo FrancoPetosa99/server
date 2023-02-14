@@ -16,14 +16,16 @@ socket.emit('EVENT NAME',  'CLIENT MESSAGE TO SERVER');
 //CONFIGURABLE SERVER LISTENERS
 /********************************************/
 socket.on('product-added', product => {
-    const card = ui.buildProductCard(product);
-    const container = document.querySelector('.container-cards-products');
-    container.appendChild(card);
+
+    const row = ui.buildProductRow(product);
+    const container = document.querySelector('tbody');
+    
+    container.appendChild(row);
     ui.displayAlert('success', `New ${product.title} added`);
 });
 
 socket.on('product-deleted', productId => {
-    ui.removeProductCard(productId);
+    ui.removeProductRow(productId);
     ui.displayAlert('error', `Product with id: ${productId} deleted`);
 });
 

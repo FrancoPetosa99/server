@@ -3,7 +3,7 @@
 /********************************************/
 import { Router } from "express";
 import { serverSocket } from "../index.js";
-import productManager from '../ProductManager.js';
+import productService from "../services/ProductService.js";
 
 const router = Router(); //INITIALIZE ROUTER
 
@@ -11,52 +11,31 @@ const router = Router(); //INITIALIZE ROUTER
 //GET METHOD ENDPOINTS
 /********************************************/
 router.get('/', async (request, response)=> {
+    try{
+        const limit = parseInt(request.query.limit);
 
-    const responseObj = {};
-    
-    const limit = parseInt(request.query.limit);
+        const products = await productService.getProducts(limit);
 
-    const array = await productManager.getProducts();
+        response.json(200, products);
 
-    if(limit){
-
-        responseObj.products = [];
-
-        let i = 0;
-
-        //handle case 1: clien asks for a number of products higher than avaiable
-        //handle case 2: client asks for a number of products lower than avaiable
-        while(i < array.length && i < limit){
-            responseObj.products[i] = array[i];
-            i++;
-        }
-
-    }else{
-        responseObj.products = array;
+    }catch(error){
+        response.json(400, "An error has occurred: " + error.message);
     }
-
-    response.end(JSON.stringify(responseObj));
 
 });
 
 router.get('/:id', async (request, response)=> {
+    try{
+        const id = isNaN(request.params.id) ? request.params.id : parseInt(request.params.id);
 
-    const responseObj = {};
-    
-    const id = isNaN(request.params.id) ? request.params.id : parseInt(request.params.id);
+        const product = await productService.getProductByID(id);
+        
+        response.json(200, product);
 
-    const product = await productManager.getProductByID(id);
-    
-    if(product){
-        responseObj.status = 200;
-        responseObj.product = product;
-    }else{
-        responseObj.status = 404;
-        responseObj.product = null
-        responseObj.message = `Could not found product with id: ${id}`;
+    }catch(error){
+        response.json(400, "An error has occurred: " + error.message);
     }
 
-    response.end(JSON.stringify(responseObj));
 });
 
 /********************************************/
@@ -64,9 +43,9 @@ router.get('/:id', async (request, response)=> {
 /********************************************/
 router.post('/', async (request, response)=> {
     try{
-        const newProduct = request.body;
-        const id = await productManager.addProduct(newProduct);
-        response.json(201, `product with id ${id} was successfully added`);
+        const dataProductObj = request.body;
+        const newProduct = await productService.createNew(dataProductObj);
+        response.json(201, `product with id ${newProduct._id} was successfully added`);
         serverSocket.emit('product-added', newProduct);
     }catch(error){
         response.json(400, 'The following errors has occurred: ' + error.message);
@@ -80,8 +59,8 @@ router.put('/:id', async (request, response)=> {
     try{
         const productId = request.params.id;
         const newData = request.body;
-        await productManager.updateProduct(productId, newData);
-        response.json(200, 'Product successfully updated');
+        const updatedProduct = await productService.updateProduct(productId, newData);
+        response.json(200, `Product ${updatedProduct.title} successfully updated`);
     }catch(error){
         response.json(400, 'The following errors has occurred: ' + error.message);
     }
@@ -93,7 +72,7 @@ router.put('/:id', async (request, response)=> {
 router.delete('/:id', async (request, response)=> {
     try{
         const productId = request.params.id;
-        await productManager.deleteProduct(productId);
+        await productService.deleteProduct(productId);
         response.json(200, `Product with id ${productId} successfully deleted`);
         serverSocket.emit('product-deleted', productId);
     }catch(error){

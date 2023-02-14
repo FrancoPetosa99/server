@@ -2,7 +2,8 @@
 //IMPORT MODULES
 /********************************************/
 import { Router } from "express";
-import productManager from "../ProductManager.js";
+import productService from "../services/ProductService.js";
+import chatService from "../services/chatService.js";
 
 const router = Router(); //INITIALIZE ROUTER
 
@@ -33,11 +34,39 @@ router.get('/home', async (request, response)=> {
 });
 
 router.get('/realtimeproducts', async (request, response)=> {
-    const products = await productManager.getProducts();
+    
+    const products = await productService.getProducts();
+    
+    //sort products by id ASC
+    const sortedList = products.sort((x, y) => x.id - y.id);
+   
     const renderObj = {
-        products: products
+        products: sortedList
     }
-    response.render('realTimeProducts', renderObj);
+    
+    response.render('realTimeProducts2', renderObj);
+
+});
+
+router.get('/chat', async (request, response)=> {
+
+    try{
+
+        const previousMessages = await chatService.getMessages();
+    
+        const renderObj = {
+            title: 'Public Chat',
+            cssFileName: 'chat.css',
+            messages: previousMessages
+        };
+    
+        response.render('chat', renderObj);
+        
+    }catch(error){
+       
+        response.send(`<h1>The following error has occurred: ${error.message}</h1>`);
+    }
+    
 
 });
 

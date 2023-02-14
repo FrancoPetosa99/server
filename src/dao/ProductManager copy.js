@@ -1,7 +1,5 @@
 //modules
 import fs from 'fs';
-//import fs from './products.json'
-//classes declaration
 
 class ProductManager{
 

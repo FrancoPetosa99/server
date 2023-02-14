@@ -2,33 +2,38 @@
 //IMPORT MODULES
 /********************************************/
 import { Server } from 'socket.io';
+import chatService from '../services/chatService.js';
 
 function ServerSocket(httpServer){
-
-    let clientSocket = 0;
 
     const socketServer = new Server(httpServer);
 
     socketServer.on('connection', socket => {
 
-        clientSocket++;
+        /********************************************/
+        //SOCKET EVENT CLIENT LISTENERS (CLIENT TO SERVER)
+        /********************************************/
+        // socket.on('EVENT NAME', data => console.log('DATA SENT FROM CLIENT: ' + data));
+        // socket.on('EVENT NAME', data => console.log('DATA SENT FROM CLIENT: ' + data));
+        
+        socket.on('message-sent', async (data) => {
+            try{
+                await chatService.saveNewMessage(data);
+                socket.broadcast.emit('new-message', data);
+            }catch(error){
+                console.log(error);
+            }
+        });
+
+       
+
 
         /********************************************/
-        //SOCKET EVENT CLIENT LISTENERS
-        /********************************************/
-        socket.on('EVENT NAME', data => console.log('DATA SENT FROM CLIENT: ' + data));
-        socket.on('EVENT NAME', data => console.log('DATA SENT FROM CLIENT: ' + data));
-        socket.on('EVENT NAME', data => console.log('DATA SENT FROM CLIENT: ' + data));
-
-        /********************************************/
-        //SOCKET CLIENT COMUNNICATION CHANNELS
+        //SOCKET CLIENT COMUNNICATION CHANNELS (SERVER TO CLIENT)
         /********************************************/
         // socket.emit('EVENT NAME', 'DATA FOR INDIVIDUAL CLIENT');
         // socket.broadcast.emit('EVENT NAME', 'DATA FOR EVERY CONNECTED CLIENT EXCEPT THE CURRENT ONE');
         // socketServer.emit('EVENT NAME', 'DATA FOR EVERY CONNECTED CLIENT');
-
-        console.log('NEW CLIENT CONNECTED');
-        console.log('CURRENT NUMBER: ' + clientSocket);
 
     });
     
