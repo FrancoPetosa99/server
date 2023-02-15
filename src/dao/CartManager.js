@@ -35,22 +35,23 @@ class CartManager{
     }
 
     async getById(id) {
-        const mongodbResponse = await model.findById(id).exec();
-        
+
+        const queryObj = {};
+        queryObj._id = id;
+
+        const mongodbResponse = await model.findOne(queryObj);
+
         if(mongodbResponse){
-            const populatedCartObj = {};
-            populatedCartObj.id = mongodbResponse._id;
-    
-            populatedCartObj.products = mongodbResponse.products.map(productObj => {
-                const populatedProductObj = {};
-                
-                populatedProductObj.product = productObj.product;
-                populatedProductObj.amount = productObj.amount;
-    
-                return populatedProductObj;
-            });
-    
-            return populatedCartObj;
+
+            const mapedArrProducts = mongodbResponse.products.map(product => this.mapProductObj(product));
+
+            const mapedObjCart = {};
+            mapedObjCart.id = mongodbResponse._id;
+
+
+            mapedObjCart.products = mapedArrProducts;
+
+            return mapedObjCart;
         }
     }
 
@@ -86,12 +87,29 @@ class CartManager{
         return updatedCartObj;
     }
 
-    async deleteById(id){
+    async deleteById(id) {
         const filterObj = {};
         filterObj._id = id;
 
         const mongodbResponse = await model.deleteOne(filterObj);
         return mongodbResponse;
+    }
+
+    mapProductObj(productObj) {
+
+        const mapedObjProduct = {};
+
+        mapedObjProduct.amount = productObj.amount;
+
+        mapedObjProduct.id = productObj.product._id;
+        mapedObjProduct.title = productObj.product.title;
+        mapedObjProduct.description = productObj.product.description;
+        mapedObjProduct.price = productObj.product.price;
+        mapedObjProduct.image = productObj.product.image;
+        mapedObjProduct.code = productObj.product.code;
+        mapedObjProduct.stock = productObj.product.stock;
+
+        return mapedObjProduct;
     }
     
 }

@@ -5,7 +5,7 @@ const collection = 'carts';
 
 //DEFINE MODEL STRUCTURE
 const dataModelObj = {
-    'products': {
+    products: {
         type: [
             {
                 product: {
@@ -24,6 +24,11 @@ const dataModelObj = {
 
 //INSTANCE SCHEMA OBJ
 const schema = new mongoose.Schema(dataModelObj);
+
+//DEFINE MIDDLEWARE FOR SCHEMA
+schema.pre('findOne', function() {
+    this.populate('products.product');
+});
 
 //INSTANCE SCHEMA MODEL
 const model = mongoose.model(collection, schema);

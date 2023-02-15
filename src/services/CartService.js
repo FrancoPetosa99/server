@@ -5,14 +5,18 @@ class CartService{
 
     constructor(){}
 
-    async getCarts(limit = null){
-        
+    async getCarts(limit = 50){
+
+        const carts = await cartManager.getAll();
+
+        const limitedCartList = carts.slice(0, limit);
+    
+        return limitedCartList;
     }
 
     async createNewCart(productObj){
 
         const productId = productObj.id;
-        const productAmount = productObj.amount;
 
         if(!productId) throw new Error(`The product id is missing`);
 

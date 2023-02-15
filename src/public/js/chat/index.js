@@ -20,6 +20,10 @@ const inputMessage = document.getElementById('input-message');
 /********************************************/
 const socket = io();
 
+socket.on("disconnect", reason => {
+    ui.displayAlert('error', 'Connection lost with server...');
+});
+
 // socket.emit('EVENT NAME',  'CLIENT MESSAGE TO SERVER');
 // socket.emit('EVENT NAME',  'CLIENT MESSAGE TO SERVER');
 

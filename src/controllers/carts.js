@@ -2,7 +2,6 @@
 //IMPORT MODULES
 /********************************************/
 import { Router } from "express";
-import cartManager from "../dao/CartManager.js";
 import cartService from "../services/CartService.js";
 
 const router = Router(); //INITIALIZE ROUTER
@@ -12,7 +11,7 @@ const router = Router(); //INITIALIZE ROUTER
 /********************************************/
 router.get('/', async (request, response)=> {
     try{
-        const cartList = await cartManager.getAll();
+        const cartList = await cartService.getCarts();
         response.json(200, cartList);
     }catch(error){
         response.json(400, 'An error occurred during process:' + error.message);
@@ -22,8 +21,8 @@ router.get('/', async (request, response)=> {
 router.get('/:cid', async (request, response)=> {
     try{
         const cartId = request.params.cid;
-        const products = await cartManager.getById(cartId);
-        response.json(200, products);
+        const cart = await cartService.getCartById(cartId);
+        response.json(200, cart);
     }catch(error){
         response.json(400, 'An error occurred during process:' + error.message);
     }
