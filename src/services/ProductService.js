@@ -6,24 +6,69 @@ class ProductService{
         
     }
 
-    async getProducts(limit = null){
+    async getProducts(queryObj){
+
+        const { limit, page, sort } = queryObj;
+
+        //check sort param is valid otherwise set to default value
+        try{
+            const isSortString = typeof sort == 'string' ? true : false;
+            if(!isSortString) throw new Error('sort param is not a string');
+
+            const sortLowercased = sort.toLowerCase();
+            const isAsc = sortLowercased == 'asc' ? true : false;
+            const isDesc = sortLowercased == 'desc' ? true : false;
+            if(!isAsc && !isDesc) throw new Error(`sort value "${sortLowercased}" is not valid`);
+
+            //at this point validations passed
+            queryObj.sort = sort;
+
+        }catch(error){
+            console.log(error.message);
+            queryObj.sort = null;
+        }
         
-        const productList = await productManager.getAll();
+        //check limit param is valid otherwise set to default value
+        try{
+            
+            const isNumber = isNaN(limit) ? false : true;
 
-        const availableProductsNumber = productList.length;
+            if(!isNumber) throw new Error('limit param is not a number');
 
-        if(!limit || limit > availableProductsNumber){
-            return productList;
+            const isBiggerThanCero = limit > 0 ? true : false;
+
+            if(!isBiggerThanCero) throw new Error('limit param must be bigger than cero');
+
+            //at this point validations passed
+            queryObj.limit = limit;
+
+        }catch(error){
+            console.log(error.message);
+            queryObj.limit = 10;
         }
 
-        const productShortedList = [];
+        //check page param is valid otherwise set to default value
+        try{
+            
+            const isNumber = isNaN(page) ? false : true;
 
-        for (let i = 0; i < limit; i++) {
-            productShortedList.push(productList[i]);
+            if(!isNumber) throw new Error('limit param is not a number');
+
+            const isBiggerThanCero = page > 0 ? true : false;
+
+            if(!isBiggerThanCero) throw new Error('limit param must be bigger than cero');
+
+            //at this point validations passed
+            queryObj.page = page;
+
+        }catch(error){
+            console.log(error.message);
+            queryObj.page = 1;
         }
+        
+        const productList = await productManager.getPagination(queryObj);
 
-        return productShortedList;
-
+        return productList;
     }
 
     async createNew(product){

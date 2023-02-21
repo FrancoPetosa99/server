@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 //SET COLLECTION NAME
 const collection = 'products';
@@ -15,6 +16,9 @@ const dataModelObj = {
 
 //INSTANCE SCHEMA OBJ
 const schema = new mongoose.Schema(dataModelObj);
+
+//ADD PLUGIN TO SCHEMA (OPTIONAL)
+schema.plugin(mongoosePaginate);
 
 //INSTANCE SCHEMA MODEL
 const model = mongoose.model(collection, schema);

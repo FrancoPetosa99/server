@@ -12,9 +12,10 @@ const router = Router(); //INITIALIZE ROUTER
 /********************************************/
 router.get('/', async (request, response)=> {
     try{
-        const limit = parseInt(request.query.limit);
+        //query params 
+        const queryObj = request.query;
 
-        const products = await productService.getProducts(limit);
+        const products = await productService.getProducts(queryObj);
 
         response.json(200, products);
 

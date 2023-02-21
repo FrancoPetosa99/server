@@ -41,13 +41,12 @@ class CartManager{
 
         const mongodbResponse = await model.findOne(queryObj);
 
-        if(mongodbResponse){
+        if(mongodbResponse) {
 
             const mapedArrProducts = mongodbResponse.products.map(product => this.mapProductObj(product));
-
+        
             const mapedObjCart = {};
             mapedObjCart.id = mongodbResponse._id;
-
 
             mapedObjCart.products = mapedArrProducts;
 
@@ -60,25 +59,27 @@ class CartManager{
         return cartObj;
     }
 
-    async create(productObj) {
+    async create() {
         const cartObj = {};
 
         cartObj.products = [];
-        cartObj.products.push({
-            product: productObj.id,
-            amount: productObj.amount
-        });
+        // cartObj.products.push({
+        //     product: productObj.id,
+        //     amount: productObj.amount
+        // });
 
         const mongodbResponse = await model.create(cartObj);
-        return mongodbResponse;
+
+        const newCartObj = {};
+        newCartObj.id = mongodbResponse._id;
+        newCartObj.products = mongodbResponse.products;
+
+        return newCartObj;
     }
 
     async updateById(id, updateObj) {
         const filterObj = {};
         filterObj._id = id;
-
-        const updatedData = {};
-
 
         await model.updateOne(filterObj, updateObj);
 
@@ -111,7 +112,50 @@ class CartManager{
 
         return mapedObjProduct;
     }
+
+    async checkCartExist(id){
+
+        let cartExist = false;
+
+        const queryObj = {};
+        queryObj._id = id;
+
+        const mongodbResponse = await model.exists(queryObj);
+
+        if(mongodbResponse) cartExist = true;
+
+        return cartExist;
+    }
     
+    async updateCartProducts(cartId, productsArr){
+
+        const mapedProductsArr = productsArr.map(({ id, amount }) => {
+            const objMaped = {};
+            objMaped.product = id;
+            objMaped.amount = amount;
+            return objMaped;
+        });
+
+        const updateObj = {};
+        updateObj.products = mapedProductsArr;
+
+        const updatedCartObj = await this.updateById(cartId, updateObj);
+
+        return updatedCartObj;
+    }
+
+    async deleteProductFromCart(cartId, productsArr){
+
+        const updateObj = {};
+        updateObj.products = productsArr.map(({id, amount}) => {
+            const mapedObj = {};
+            mapedObj.product = id;
+            mapedObj.amount = amount;
+            return mapedObj;
+        });
+
+        await this.updateById(cartId, updateObj);
+    }
 }
 
 const cartManager = new CartManager(); //INITIALIZE THE CART MANAGER

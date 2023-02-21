@@ -36,6 +36,41 @@ class ProductManager{
         return productList;
     }
 
+    async getPagination(queryObj){
+
+        const { limit, page, sort } = queryObj;
+
+        //build filter obj
+        const filterObj = {};
+
+        //build option obj
+        const optionObj = {};
+        optionObj.limit = limit;
+        optionObj.page = page;
+
+        //build sort obj
+        if(sort){
+            optionObj.sort = {
+                price: sort //{field: sort (asc/desc)}
+            };
+        }
+        
+        const mongodbResponse = await model.paginate(filterObj, optionObj);
+
+        const responseObj = {};
+
+        responseObj.currentPage = mongodbResponse.page;
+        responseObj.nextPage = mongodbResponse.nextPage;
+        responseObj.prevPage = mongodbResponse.prevPage;
+        responseObj.totalProducts = mongodbResponse.totalDocs;
+        responseObj.totalPages = mongodbResponse.totalPages;
+        responseObj.nextPageLink = responseObj.nextPage ? `http://localhost:8080/api/products?limit=${limit}&page=${responseObj.nextPage}&sort=${sort}` : null;
+        responseObj.prevPageLink = responseObj.prevPage ? `http://localhost:8080/api/products?limit=${limit}&page=${responseObj.prevPage}&sort=${sort}` : null;
+        responseObj.products = mongodbResponse.docs.map(product => this.mapProductObj(product));
+
+        return responseObj;
+    }
+
     async getById(id) {
 
         const mongodbObjResponse = await model.findById(id).exec();
@@ -96,6 +131,23 @@ class ProductManager{
         if(mongodbResponse) productExist = true;
 
         return productExist;
+    }
+
+    mapProductObj(productObj) {
+
+        const mapedObjProduct = {};
+
+        mapedObjProduct.amount = productObj.amount;
+
+        mapedObjProduct.id = productObj._id;
+        mapedObjProduct.title = productObj.title;
+        mapedObjProduct.description = productObj.description;
+        mapedObjProduct.price = productObj.price;
+        mapedObjProduct.image = productObj.image;
+        mapedObjProduct.code = productObj.code;
+        mapedObjProduct.stock = productObj.stock
+
+        return mapedObjProduct;
     }
 }
 
