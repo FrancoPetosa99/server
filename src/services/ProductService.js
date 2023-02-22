@@ -8,26 +8,20 @@ class ProductService{
 
     async getProducts(queryObj){
 
-        const { limit, page, sort } = queryObj;
+        const { limit, page, sort, category, available} = queryObj;
+
+        const filterObj = {};
 
         //check sort param is valid otherwise set to default value
-        try{
-            const isSortString = typeof sort == 'string' ? true : false;
-            if(!isSortString) throw new Error('sort param is not a string');
-
+        if(sort){
             const sortLowercased = sort.toLowerCase();
             const isAsc = sortLowercased == 'asc' ? true : false;
             const isDesc = sortLowercased == 'desc' ? true : false;
-            if(!isAsc && !isDesc) throw new Error(`sort value "${sortLowercased}" is not valid`);
-
-            //at this point validations passed
-            queryObj.sort = sort;
-
-        }catch(error){
-            console.log(error.message);
-            queryObj.sort = null;
+            if(isAsc && isDesc){
+                filterObj.sort = sort;
+            }
         }
-        
+    
         //check limit param is valid otherwise set to default value
         try{
             
@@ -40,11 +34,11 @@ class ProductService{
             if(!isBiggerThanCero) throw new Error('limit param must be bigger than cero');
 
             //at this point validations passed
-            queryObj.limit = limit;
+            filterObj.limit = JSON.parse(limit);
 
         }catch(error){
             console.log(error.message);
-            queryObj.limit = 10;
+            filterObj.limit = 10;
         }
 
         //check page param is valid otherwise set to default value
@@ -59,14 +53,28 @@ class ProductService{
             if(!isBiggerThanCero) throw new Error('limit param must be bigger than cero');
 
             //at this point validations passed
-            queryObj.page = page;
+            filterObj.page = JSON.parse(page);
 
         }catch(error){
             console.log(error.message);
-            queryObj.page = 1;
+            filterObj.page = 1;
         }
-        
-        const productList = await productManager.getPagination(queryObj);
+
+        //check available param is valid otherwise set to default value
+        if(available){
+            const availableLowerCased = available.toLowerCase();
+            if(availableLowerCased == 'true' || availableLowerCased == 'false'){
+                filterObj.available = JSON.parse(availableLowerCased);
+            }
+        }
+
+        //check category param is valid otherwise set to default value
+        if(category){
+            const categoryLowerCased = category.toLowerCase()
+            filterObj.category = categoryLowerCased;
+        }
+
+        const productList = await productManager.getPagination(filterObj);
 
         return productList;
     }

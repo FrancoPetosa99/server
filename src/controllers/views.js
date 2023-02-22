@@ -26,12 +26,20 @@ router.get('/products/:id', async (request, response)=> {
 });
 
 router.get('/home', async (request, response)=> {
-    const products = await productManager.getProducts();
-    const renderObj = {
-        products: products
-    }
-    response.render('home', renderObj);
+    try{
 
+        const queryObj = request.query;
+
+        const productBatch = await productService.getProducts(queryObj);
+
+        const renderObj = {};
+        renderObj.productBatch = productBatch;
+
+        response.render('home', renderObj);
+
+    }catch(error){
+        response.send(`<h1>The following error has occurred: ${error.message}</h1>`);
+    }
 });
 
 router.get('/realtimeproducts', async (request, response)=> {

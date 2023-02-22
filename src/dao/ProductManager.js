@@ -10,7 +10,9 @@ class ProductManager{
             'price',
             'image',
             'code',
-            'stock'
+            'stock',
+            'category',
+            'available'
         ];
     }
 
@@ -38,11 +40,13 @@ class ProductManager{
 
     async getPagination(queryObj){
 
-        const { limit, page, sort } = queryObj;
+        const { limit, page, sort , category, available} = queryObj;
 
         //build filter obj
         const filterObj = {};
-
+        if(category) filterObj.category = category;
+        if(available) filterObj.available = available;
+        
         //build option obj
         const optionObj = {};
         optionObj.limit = limit;
@@ -54,6 +58,8 @@ class ProductManager{
                 price: sort //{field: sort (asc/desc)}
             };
         }
+
+        console.log(filterObj);
         
         const mongodbResponse = await model.paginate(filterObj, optionObj);
 

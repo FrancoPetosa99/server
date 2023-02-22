@@ -12,6 +12,8 @@ const dataModelObj = {
     image: String,
     code: Number,
     stock: Number,
+    category: String,
+    available: Boolean
 };
 
 //INSTANCE SCHEMA OBJ
