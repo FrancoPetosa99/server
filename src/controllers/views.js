@@ -5,6 +5,7 @@ import { Router } from "express";
 import productService from "../services/ProductService.js";
 import cartService from "../services/cartService.js";
 import chatService from "../services/chatService.js";
+import { privateAccess, publicAccess } from '../middlewares/index.js'
 
 const router = Router(); //INITIALIZE ROUTER
 
@@ -143,6 +144,51 @@ router.get('/cart', async (request, response)=> {
         };
         
         response.render('checkout', renderObj);
+        
+    }catch(error){
+        response.send(`<h1>The following error has occurred: ${error.message}</h1>`);
+    }
+});
+
+router.get('/logging', publicAccess, async (request, response)=> {
+    try{
+
+        const renderObj = {
+            title: 'Logging',
+            cssFileName: 'logging.css',
+        };
+        
+        response.render('logging', renderObj);
+        
+    }catch(error){
+        response.send(`<h1>The following error has occurred: ${error.message}</h1>`);
+    }
+});
+
+router.get('/signup', publicAccess, async (request, response)=> {
+    try{
+
+        const renderObj = {
+            title: 'Sign Up',
+            cssFileName: 'signup.css',
+        };
+        
+        response.render('signup', renderObj);
+        
+    }catch(error){
+        response.send(`<h1>The following error has occurred: ${error.message}</h1>`);
+    }
+});
+
+router.get('/profile', privateAccess, async (request, response)=> {
+    try{
+
+        const renderObj = {
+            title: 'Profile',
+            cssFileName: 'profile.css',
+        };
+        
+        response.render('profile', renderObj);
         
     }catch(error){
         response.send(`<h1>The following error has occurred: ${error.message}</h1>`);

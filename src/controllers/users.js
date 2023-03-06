@@ -2,22 +2,26 @@
 //IMPORT MODULES
 /********************************************/
 import { Router } from "express";
-import model from "../dao/models/users.js";
+import userService from "../services/UserService.js";
 
 const router = Router(); //INITIALIZE ROUTER
 
 /********************************************/
 //GET METHOD ENDPOINTS
 /********************************************/
-router.get('/', async (request, response)=> {
+router.get('/profile', async (request, response)=> {
     try{
-        const userList = await model.find();
-        response.json(200, userList);
 
-    }catch(error){
+        const email = request.session.user.email;
+
+        const userData = await userService.getUserData(email);
         
-        response.json(400, 'The following error has occurred: ' + error.message);
+        const responseObj = {};
+        responseObj.data = userData;
 
+        response.json(200, responseObj);
+    }catch(error){
+        response.json(400, 'The following error has occurred: ' + error.message);
     }
 });
 
@@ -26,10 +30,20 @@ router.get('/', async (request, response)=> {
 /********************************************/
 router.post('/', async (request, response)=> {
     
-    const userObj = request.body;
-    const responseDB = await model.create(userObj);
-    response.json('end point POST users');
+    try{
+        
+        const newUserData = request.body;
 
+        await userService.createNewUser(newUserData);
+
+        const responseObj = {};
+        responseObj.message = 'Account succesfully created';
+    
+        response.json(200, responseObj);
+        
+    }catch(error){
+        response.json(400, 'The following error has occurred: ' + error.message);
+    }
 });
 
 export default router;

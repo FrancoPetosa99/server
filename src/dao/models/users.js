@@ -9,8 +9,11 @@ const dataModelObj = {
         type: String,
         unique: true,
     },
-    age: Number,
-    active: Boolean
+    active: {
+        type: Boolean,
+        default: true
+    },
+    password: String
 };
 
 const schema = new mongoose.Schema(dataModelObj);

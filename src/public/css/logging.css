@@ -1,0 +1,66 @@
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.container{
+    width: 100%;
+    max-width: 350px;
+    min-height: 100vh;
+    height: auto;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.control-input{
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: .2rem;
+}
+
+.links-controller{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.link-text{
+    font-size: 12px;
+}
+
+.link-text > a{
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.input{
+    width: 100%;
+    height: auto;
+    padding: .4rem;
+}
+
+#btn-loggin{
+    width: 100%;
+}
+
+.error-message{
+    color:  red;
+}
+
+.invisible{
+    opacity: 0;
+}
+
+.hide{
+    display: none;
+}
