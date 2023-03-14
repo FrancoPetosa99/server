@@ -195,4 +195,19 @@ router.get('/profile', privateAccess, async (request, response)=> {
     }
 });
 
+router.get('/resetPassword', publicAccess, async (request, response)=> {
+    try{
+
+        const renderObj = {
+            title: 'Reset Password',
+            cssFileName: 'resetPassword.css',
+        };
+        
+        response.render('resetPassword', renderObj);
+        
+    }catch(error){
+        response.send(`<h1>The following error has occurred: ${error.message}</h1>`);
+    }
+});
+
 export default router;

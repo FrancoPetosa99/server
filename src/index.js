@@ -10,6 +10,8 @@ import handlebars from 'express-handlebars';
 import __dirname from './utils.js';
 import ServerSocket from './sockets/index.js';
 import mongoose from 'mongoose';
+import passport from 'passport';
+import initializePassport from './config/passport.js';
 
 const app = express();
 
@@ -45,6 +47,9 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
+initializePassport();
+app.use(passport.initialize());
+app.use(passport.session());
 
 const serverSocket = ServerSocket(httpServer); //INITIALIZE SOCKET SERVER
 
@@ -79,4 +84,6 @@ routes(app);
 /********************************************/
 export { serverSocket };
 
-//https://drive.google.com/drive/u/0/folders/1IUE6fpYr-82KV_07vFQqlBo_JF9z3u0L
+//https://drive.google.com/drive/u/0/folders/1t9COby1-r5xI2HdHfEyyyhRyp9EVXGVE
+
+//GitHub Client Secret: dd50fe05fd5571fdf8f23177131731c6342836b1

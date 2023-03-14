@@ -1,20 +1,27 @@
 import userManager from "../dao/UserManager.js";
+import encrypt from "../util/encrypt.js";
 
 class UserService{
 
     constructor(){}
 
     async createNewUser(newUserData){
+        
+        //hash password
+        newUserData.password = encrypt.getHashedPassword(newUserData.password);
 
-        const usermappedObj = {};
-        usermappedObj.firstName = newUserData.firstName;
-        usermappedObj.lastName = newUserData.lastName;
-        usermappedObj.email = newUserData.email;
-        usermappedObj.password = newUserData.password;
-
-        const userData = await userManager.createUser(usermappedObj);
+        const userData = await userManager.createUser(newUserData);
         
         return userData;
+
+    }
+
+    async createNewUserByThird(newUserData){
+        
+        const userData = await userManager.createUser(newUserData);
+        
+        return userData;
+
     }
 
     async checkEmailAndPassword(email, password){
@@ -29,13 +36,29 @@ class UserService{
         }
 
         //check passwords matches
-        if(userData.password != password){
+        const passwordMatch = encrypt.checkPassword(password, userData.password);
+           
+        if(!passwordMatch){
             const error = new Error('incorrect password');
             error.code = 200;
             throw error;
         }
 
         return userData;
+    }
+
+    async resetPassword(userObjData){
+        
+        const { email, oldPassword, newPassword } = userObjData;
+
+        //check email and old password are valid
+        await this.checkEmailAndPassword(email, oldPassword);
+
+        //encrypt new password
+        const encryptedNewPassword = encrypt.getHashedPassword(newPassword);
+
+        await userManager.updatePassword(email, encryptedNewPassword);
+
     }
     
     async getUserData(userEmail){

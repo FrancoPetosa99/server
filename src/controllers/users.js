@@ -3,6 +3,7 @@
 /********************************************/
 import { Router } from "express";
 import userService from "../services/UserService.js";
+import passport from "passport";
 
 const router = Router(); //INITIALIZE ROUTER
 
@@ -25,24 +26,56 @@ router.get('/profile', async (request, response)=> {
     }
 });
 
+router.get('/failRegister', ()=> {
+    const error = {};
+    error.message = 'Could not create account';
+    response.json(200, error);
+});
+
 /********************************************/
 //POST METHOD ENDPOINTS
 /********************************************/
-router.post('/', async (request, response)=> {
+router.post('/', passport.authenticate('register', {failureRedirect: '/failRegister'}), async (request, response)=> {
     
     try{
-        
-        const newUserData = request.body;
-
-        await userService.createNewUser(newUserData);
-
+    
         const responseObj = {};
         responseObj.message = 'Account succesfully created';
     
         response.json(200, responseObj);
         
     }catch(error){
+        console.log(error.message);
         response.json(400, 'The following error has occurred: ' + error.message);
+    }
+});
+
+/********************************************/
+//PATCH METHOD ENDPOINTS
+/********************************************/
+router.patch('/', async (request, response)=> {
+    
+    try{
+        
+        const { email, newPassword, oldPassword } = request.body;
+
+        const userData = {};
+        userData.email = email;
+        userData.oldPassword = oldPassword;
+        userData.newPassword = newPassword;
+
+        await userService.resetPassword(userData);
+
+        const responseObj = {};
+        responseObj.message = 'Password successfully updated';
+    
+        response.json(200, responseObj);
+        
+    }catch(error){
+        console.log(error.message);
+        const responseObj = {};
+        responseObj.message = 'The following error has occurred: ' + error.message;
+        response.json(400, responseObj);
     }
 });
 

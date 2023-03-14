@@ -27,18 +27,28 @@ class UserManager{
 
     async getUserByEmail(userEmail){
 
+        let user = null;
+
         const mongodbResponse = await users.findOne({email: userEmail});
 
-        //map mongo db query response
-        const user =  {};
-        user.firstName = mongodbResponse.firstName;
-        user.lastName = mongodbResponse.lastName;
-        user.email = mongodbResponse.email;
-        user.active = mongodbResponse.active;
-        user.password = mongodbResponse.password;
-        user.id = mongodbResponse._id;
+        if(mongodbResponse){
+            //map mongo db query response
+            user =  {};
+            user.firstName = mongodbResponse.firstName;
+            user.lastName = mongodbResponse.lastName;
+            user.email = mongodbResponse.email;
+            user.active = mongodbResponse.active;
+            user.password = mongodbResponse.password;
+            user.id = mongodbResponse._id;
+        }
 
         return user;
+    }
+
+    async updatePassword(email, newPassword){
+    
+        return users.updateOne({ email }, { password: newPassword});
+        
     }
     
 }

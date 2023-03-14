@@ -2,7 +2,7 @@
 //IMPORT MODULES
 /********************************************/
 import { Router } from "express";
-import userService from "../services/UserService.js";
+import passport from "passport";
 
 const router = Router(); //INITIALIZE ROUTER
 
@@ -25,32 +25,51 @@ router.get('/logout', (request, response)=> {
     }
 });
 
+router.get('/failLogin', ()=> {
+    const error = {};
+    error.message = 'Could not loggin';
+    response.json(200, error);
+});
+
+router.get('/github', passport.authenticate('github', {scope: ['user: email'] }));
+
+router.get('/githubCallback', passport.authenticate('github',  {failureRedirect: '/logging'}), (request, response)=> {
+    try{
+        request.session.user = request.user;
+        response.redirect('/api/views/profile');
+
+    }catch(error){
+        console.log(error);
+    }
+});
+
 /********************************************/
 //POST METHOD ENDPOINTS
 /********************************************/
-router.post('/', async (request, response)=> {
+router.post('/', passport.authenticate('login', {failureRedirect: 'failLogin'}), async (request, response)=> {
 
     const responseObj = {};
 
     try{
-        const { email, password } = request.body;
 
-        const userData = await userService.checkEmailAndPassword(email, password)
+        const { firstName, lastName, email, id } = request.user;
 
         request.session.user = {
-            firstName: userData.firstName,
-            lastName: userData.lastName,
-            email: userData.email,
-            id: userData.id
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            id: id
         }
         
         responseObj.message = 'Successfully loggin';
-        response.json(200, responseObj); 
+        response.json(200, responseObj);
+
     }catch(error){
         responseObj.message = 'email address and password are not correct';
         response.json(400, responseObj);   
     }
 });
+
 
 /********************************************/
 //PUT METHOD ENDPOINTS
