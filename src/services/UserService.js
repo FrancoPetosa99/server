@@ -1,5 +1,6 @@
 import userManager from "../dao/UserManager.js";
 import encrypt from "../util/encrypt.js";
+import CustomError from "../util/customError.js";
 
 class UserService{
 
@@ -7,8 +8,10 @@ class UserService{
 
     async createNewUser(newUserData){
         
+        const { password } = newUserData;
+        
         //hash password
-        newUserData.password = encrypt.getHashedPassword(newUserData.password);
+        newUserData.password = encrypt.getHashedPassword(password);
 
         const userData = await userManager.createUser(newUserData);
         
@@ -29,20 +32,12 @@ class UserService{
         const userData = await userManager.getUserByEmail(email);
 
         //check user exist
-        if(!userData) {
-            const error = new Error('user not found');
-            error.code = 404;
-            throw error;
-        }
+        if(!userData) throw new CustomError(404, `Could not found user with email ${email}`);
 
         //check passwords matches
         const passwordMatch = encrypt.checkPassword(password, userData.password);
            
-        if(!passwordMatch){
-            const error = new Error('incorrect password');
-            error.code = 200;
-            throw error;
-        }
+        if(!passwordMatch)  throw new CustomError(401, `Email and password are not correct`);
 
         return userData;
     }
@@ -64,9 +59,20 @@ class UserService{
     async getUserData(userEmail){
 
         const userData = await userManager.getUserByEmail(userEmail)
-        
+
+        if(!userData) throw new CustomError(404, `Could not found user with email ${email}`);
+
         return userData;
+    }
+
+    async checkUserExists(email){
+        let userExist = false;
+
+        const user = await userManager.getUserByEmail(email);
+
+        if(user) userExist = true;
         
+        return userExist;
     }
 
     verifyHexaNumber(hexaNumber){

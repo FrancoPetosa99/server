@@ -3,29 +3,16 @@
 /********************************************/
 import { Router } from "express";
 import userService from "../services/UserService.js";
-import passport from "passport";
+import jwtManager from "../util/jwt.js";
+import signUpValidation from "../middlewares/signUpValidation.js";
+import { authentication } from '../middlewares/index.js'
+import CustomError from "../util/customError.js";
 
 const router = Router(); //INITIALIZE ROUTER
 
 /********************************************/
 //GET METHOD ENDPOINTS
 /********************************************/
-router.get('/profile', async (request, response)=> {
-    try{
-
-        const email = request.session.user.email;
-
-        const userData = await userService.getUserData(email);
-        
-        const responseObj = {};
-        responseObj.data = userData;
-
-        response.json(200, responseObj);
-    }catch(error){
-        response.json(400, 'The following error has occurred: ' + error.message);
-    }
-});
-
 router.get('/failRegister', ()=> {
     const error = {};
     error.message = 'Could not create account';
@@ -35,18 +22,51 @@ router.get('/failRegister', ()=> {
 /********************************************/
 //POST METHOD ENDPOINTS
 /********************************************/
-router.post('/', passport.authenticate('register', {failureRedirect: '/failRegister'}), async (request, response)=> {
-    
+router.post('/', signUpValidation, async (request, response)=> {
     try{
-    
-        const responseObj = {};
-        responseObj.message = 'Account succesfully created';
-    
-        response.json(200, responseObj);
+        const { firstName, lastName, email, password, role } = request.body;
+
+        const userExist = await userService.checkUserExists(email);
+
+        if(userExist) throw new CustomError(400, `Already exist user with email ${email}`);
+
+        const newUserData = {};
+        newUserData.firstName = firstName;
+        newUserData.lastName = lastName;
+        newUserData.email = email;
+        newUserData.password = password;
+        newUserData.role = role;
         
+        //create user on data base
+        const userData = await userService.createNewUser(newUserData);
+
+        //generate jwt token and send to client by cookies
+        const token = jwtManager.generateToken(userData);
+        
+        //send response to client and the access token by cookies
+        response
+        .cookie('authToken', token)
+        .status(201)
+        .json({
+            status: 'Success',
+            message: 'Account successfully created'
+        });
+
     }catch(error){
-        console.log(error.message);
-        response.json(400, 'The following error has occurred: ' + error.message);
+        //handle error response
+
+        const statusCode = error.statusCode || 500;
+        const message = error.message || 'An unexpected error has ocurred';
+
+        //send response to client
+        response
+        .status(statusCode)
+        .json({
+            status: 'Error',
+            error: {
+                message: message
+            }
+        });
     }
 });
 
@@ -72,10 +92,13 @@ router.patch('/', async (request, response)=> {
         response.json(200, responseObj);
         
     }catch(error){
-        console.log(error.message);
-        const responseObj = {};
-        responseObj.message = 'The following error has occurred: ' + error.message;
-        response.json(400, responseObj);
+        //build error response
+        const errorResponseObj = {};
+        errorResponseObj.status = 'Error';
+        errorResponseObj.error = error.message || 'An unexpected error has ocurred';
+
+        //send response to client
+        response.json(500, errorResponseObj);
     }
 });
 

@@ -1,0 +1,7 @@
+{
+  "response": {
+    "status": "Success/Error",
+    "message": "brief description of the process - optional",
+    "error": "brief description of the error - optional"
+  }
+}

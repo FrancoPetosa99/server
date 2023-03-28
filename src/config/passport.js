@@ -4,13 +4,15 @@ import passportLocal from 'passport-local';
 import userService from '../services/UserService.js';
 import users from '../dao/models/users.js';
 import GHStrategy from 'passport-github2';
-
-/********************************************/
-//LOCAL AUTHENTICATION ESTRATEGY (USER - PASSWORD)
-/********************************************/
-const localStrategy = passportLocal.Strategy;
+import jwt from 'passport-jwt';
+import cookieExtractor from '../util/cookieExtractor.js';
 
 const initializePassport = ()=> {
+
+    /********************************************************/
+    //LOCAL AUTHENTICATION ESTRATEGY (USER - PASSWORD)
+    /********************************************************/
+    const localStrategy = passportLocal.Strategy;
 
     const registerStategyObj = {
         passReqToCallback: true,
@@ -19,7 +21,7 @@ const initializePassport = ()=> {
 
     passport.use('register', new localStrategy(registerStategyObj, async (request, username, password, done)=> {
         
-        const { firstName, lastName, email } = request.body;
+        const { firstName, lastName } = request.body;
 
         try{
 
@@ -34,12 +36,29 @@ const initializePassport = ()=> {
             const userCreated = await userService.createNewUser(newUserObj);
 
             done(null, userCreated);
+            
+        }catch(error){
+            done(error);
+        }
+    }));
+    
+    const loginStategyObj = {
+        passReqToCallback: true,
+        usernameField: 'email',
+    }
+
+    passport.use('login', new localStrategy(loginStategyObj, async (request, username, password, done)=> {
+        try{
+            
+            const user = await userService.checkEmailAndPassword(username, password);
+
+            if(!user) return done(null, false);
+
+            done(null, user);
 
         }catch(error){
             done(error);
         }
-
-
     }));
 
     passport.serializeUser((user, done)=> {
@@ -51,27 +70,10 @@ const initializePassport = ()=> {
         done(null, user);
     });
 
-    const loginStategyObj = {
-        passReqToCallback: true,
-        usernameField: 'email',
-    }
 
-    passport.use('login', new localStrategy(loginStategyObj, async (request, username, password, done)=> {
-        try{
-            
-            const user = await userService.checkEmailAndPassword(username, password);
-
-            if(!user){
-                return done(null, false);
-            }
-
-            done(null, user);
-
-        }catch(error){
-            done(error);
-        }
-
-    }));
+    /********************************************************/
+    //THIRD PARTY AUTHENTICATION ESTRATEGY (GITHUB)
+    /********************************************************/
 
     const GHStrategyObj = {
         clientID: 'Iv1.0cf3273a63e06ee3',
@@ -101,6 +103,25 @@ const initializePassport = ()=> {
 
             done(null, user);
 
+        }catch(error){
+            done(error);
+        }
+    }));
+
+    /********************************************************/
+    //JWT AUTHENTICATION ESTRATEGY (USER - PASSWORD)
+    /********************************************************/
+    const JWTStrategy = jwt.Strategy;
+    const extractJWT = jwt.ExtractJwt;
+
+    const JWTStrategyObj = {
+        jwtFromRequest: extractJWT.fromExtractors([cookieExtractor]),
+        secretOrKey: 'JWT_SECRET_KEY'
+    }
+
+    passport.use('jwt', new JWTStrategy(JWTStrategyObj, async (jwtPayload, done)=> {
+        try{
+            done(null, jwtPayload);
         }catch(error){
             done(error);
         }

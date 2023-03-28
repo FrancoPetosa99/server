@@ -5,7 +5,7 @@ import { Router } from "express";
 import productService from "../services/ProductService.js";
 import cartService from "../services/cartService.js";
 import chatService from "../services/chatService.js";
-import { privateAccess, publicAccess } from '../middlewares/index.js'
+import { privateAccess, publicAccess } from '../middlewares/index.js';
 
 const router = Router(); //INITIALIZE ROUTER
 

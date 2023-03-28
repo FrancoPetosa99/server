@@ -2,6 +2,7 @@
 //IMPORT MODULES
 /********************************************/
 import users from '../dao/models/users.js'
+import CustomError from '../util/customError.js';
 
 /********************************************/
 //CART MANAGER CLASS
@@ -12,45 +13,46 @@ class UserManager{
     }
 
     async createUser(newUserData){
+        try{
+            const mongodbResponse = await users.create(newUserData);
 
-        const mongodbResponse = await users.create(newUserData);
-        
-        const usermappedObj = {};
-        usermappedObj.firstName = mongodbResponse.firstName;
-        usermappedObj.lastName = mongodbResponse.lastName;
-        usermappedObj.email = mongodbResponse.email;
-        usermappedObj.password = mongodbResponse.password;
-        usermappedObj.id = mongodbResponse._id;
+            const usermappedObj = {};
+            usermappedObj.firstName = mongodbResponse.firstName;
+            usermappedObj.lastName = mongodbResponse.lastName;
+            usermappedObj.email = mongodbResponse.email;
+            usermappedObj.password = mongodbResponse.password;
+            usermappedObj.id = mongodbResponse._id;
+    
+            return usermappedObj;
 
-        return usermappedObj;
+        }catch(error){
+            throw new CustomError(`An unexpected error has occurred`, 500);
+        }
     }
 
     async getUserByEmail(userEmail){
-
-        let user = null;
-
         const mongodbResponse = await users.findOne({email: userEmail});
 
         if(mongodbResponse){
             //map mongo db query response
-            user =  {};
+            const user =  {};
             user.firstName = mongodbResponse.firstName;
             user.lastName = mongodbResponse.lastName;
             user.email = mongodbResponse.email;
             user.active = mongodbResponse.active;
             user.password = mongodbResponse.password;
             user.id = mongodbResponse._id;
+            user.birthdate = mongodbResponse.birthdate;
+            return user;
         }
-
-        return user;
+        return null;
     }
 
     async updatePassword(email, newPassword){
     
         return users.updateOne({ email }, { password: newPassword});
         
-    }
-    
+    }    
 }
 
 const userManager = new UserManager(); //INITIALIZE THE CART MANAGER

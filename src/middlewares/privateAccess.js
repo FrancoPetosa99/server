@@ -1,12 +1,19 @@
+import cookieExtractor from "../util/cookieExtractor.js";
+import jwtManager from "../util/jwt.js";
+
 function privateAccess(request, response, next){
+    
+    const cookieName = 'authToken';
+    const authToken = cookieExtractor(request, cookieName);
 
-    const isAuthenticated = request.session.user ? true : false;
-
-    if(isAuthenticated){
-        next();
-    }else{
-        response.redirect('/api/views/logging');
+    if(authToken){
+        const isTokenValid = jwtManager.verifyToken(authToken);
+        if(isTokenValid){
+            return next();
+        }
     }
+    
+    response.redirect('/api/views/logging');
 }
 
 export default privateAccess;

@@ -22,8 +22,13 @@ const dataModelObj = {
     }
 };
 
+const schemaConfigObj = {
+    timestamps: false,
+    versionKey: false
+};
+
 //INSTANCE SCHEMA OBJ
-const schema = new mongoose.Schema(dataModelObj);
+const schema = new mongoose.Schema(dataModelObj, schemaConfigObj);
 
 //DEFINE MIDDLEWARE FOR SCHEMA
 schema.pre('findOne', function() {

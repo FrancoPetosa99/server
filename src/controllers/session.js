@@ -3,6 +3,10 @@
 /********************************************/
 import { Router } from "express";
 import passport from "passport";
+import userService from "../services/UserService.js";
+import jwtManager from "../util/jwt.js";
+import signInValidation from "../middlewares/signInValidation.js";
+import authentication from "../middlewares/authentication.js";
 
 const router = Router(); //INITIALIZE ROUTER
 
@@ -11,17 +15,25 @@ const router = Router(); //INITIALIZE ROUTER
 /********************************************/
 router.get('/logout', (request, response)=> {
     try{
-        request.session.destroy((error)=> {
-            if(error) throw new Error(error);
-            //response.redirect('api/views/logging');
-            const responseObj = {};
-            responseObj.message = 'succesfully logout';
-            response.json(200, responseObj);
-        });
-    }catch(error){
         const responseObj = {};
-        responseObj.message = 'unhandle error has occurred';
-        response.json(500, responseObj);
+        responseObj.status = 'Success';
+        responseObj.message = 'succesfully logout';
+        
+        response
+        .clearCookie('authToken')
+        .status(200)
+        .json(responseObj);
+
+    }catch(error){
+        //build error response
+        const errorResponseObj = {};
+        errorResponseObj.status = 'Error';
+        errorResponseObj.error = error.message || 'An unexpected error has ocurred';
+
+        //send response to client
+        response
+        .status(500)
+        .json(errorResponseObj); 
     }
 });
 
@@ -43,30 +55,86 @@ router.get('/githubCallback', passport.authenticate('github',  {failureRedirect:
     }
 });
 
+router.get('/current', authentication('authToken'), async (request, response)=> {
+    try{
+
+        const userEmail = request.user.email;
+        const userData = await userService.getUserData(userEmail);
+
+        const { email, firstName, lastName, birthdate, id, active } = userData;
+
+        const mapUserObj = {};
+        mapUserObj.email = email;
+        mapUserObj.firstName = firstName;
+        mapUserObj.lastName = lastName;
+        mapUserObj.birthdate = birthdate;
+        mapUserObj.id = id;
+        mapUserObj.active = active;
+
+       //send response to client and the access token by cookies
+       response
+       .status(200)
+       .json({
+            status: 'Success',
+            data: mapUserObj
+       });
+
+    }catch(error){
+        //handle error response
+        
+        const statusCode = error.statusCode || 500;
+        const message = error.message || 'An unexpected error has ocurred';
+
+        //send response to client
+        response
+        .status(statusCode)
+        .json({
+            status: 'Error',
+            error:{
+                message: message
+            }
+        });
+    }
+});
+
 /********************************************/
 //POST METHOD ENDPOINTS
 /********************************************/
-router.post('/', passport.authenticate('login', {failureRedirect: 'failLogin'}), async (request, response)=> {
-
-    const responseObj = {};
-
+router.post('/', signInValidation, async (request, response)=> {
     try{
 
-        const { firstName, lastName, email, id } = request.user;
+        const { email, password } = request.body;
 
-        request.session.user = {
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            id: id
-        }
+        //check if email and password are valid
+        const userData = await userService.checkEmailAndPassword(email, password);
+
+        //user credentials are valid so generate jwt token
+        const token = jwtManager.generateToken(userData);
         
-        responseObj.message = 'Successfully loggin';
-        response.json(200, responseObj);
+        //send response to client and token by cookies
+        response
+        .cookie('authToken', token)
+        .status(200)
+        .json({
+            status: 'Success',
+            message: 'Successfully loggin'
+        });
 
     }catch(error){
-        responseObj.message = 'email address and password are not correct';
-        response.json(400, responseObj);   
+        //handle error response
+
+        const statusCode = error.statusCode || 500;
+        const message = error.message || 'An unexpected error has ocurred';
+
+        //send response to client
+        response
+        .status(statusCode)
+        .json({
+            status: 'Error',
+            error: {
+                message: message
+            }
+        });
     }
 });
 

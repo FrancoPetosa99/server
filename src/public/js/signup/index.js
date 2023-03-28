@@ -15,9 +15,8 @@ const formInputs = document.querySelectorAll('.input');
 /********************************************/
 //HELPER FUNCTIONS
 /********************************************/
+
 async function signUp(newUserObj){
-    
-    ui.handleBtnLoading();
 
     const response = await fetch('http://localhost:8080/api/users', {
         method: 'POST',
@@ -27,32 +26,28 @@ async function signUp(newUserObj){
         body: JSON.stringify(newUserObj)
     });
 
-    ui.handleBtnLoading();
-
-    const data = response.json();
-
-    ui.displayAlert('success', data.message);
-    
-    if(response.status == 200) {
-        setTimeout(()=> {
-            window.location.href = 'http://localhost:8080/api/views/logging';
-        }, 1500);
-    }
-
+   return response;
 }
 
-function handleValidation(input){
+function handleAPIResonse(statusCode, data){
+    const alert = {};
 
-    let isValid = true;
-
-    const value = input.value;
-
-    if(!value){
-        isValid = false;
-        ui.setErrorOnField(input);
+    if(statusCode !== 201){
+        alert.type = 'error';
+        alert.title = 'Ups! Something went wrong';
+        if(statusCode !== 500){
+            alert.message = data.error.message;
+        }else{
+            alert.message = 'Please try again later';
+        }
+    }else{
+        alert.type = 'success';
+        alert.title = 'Welcome';
+        alert.message = data.message;
+        setTimeout(()=> window.location.href = 'http://localhost:8080/api/views/logging', 1500);
     }
 
-    return isValid;
+    ui.displayAlert(alert.type, alert.message, alert.title);
 }
 
 /********************************************/
@@ -73,38 +68,34 @@ formSignUp.addEventListener('submit', async (e)=> {
 
     const newUserObj = {};
 
-    let isAllDataValid = true;
+    formData.forEach((value, key)=> newUserObj[key] = value); 
 
-    formData.forEach((value, key) => {
+    try{
+        ui.handleBtnLoading();
+        const response = await signUp(newUserObj);
+        ui.handleBtnLoading();
 
-        const input = form.querySelector(`[name = ${key}]`);
+        const statusCode = response.status;
+        const data = await response.json();
 
-        const isValid = handleValidation(input);
+        handleAPIResonse(statusCode, data);
 
-        if(isValid){
-            newUserObj[key] = value;
-        }else{
-            isAllDataValid = false;
-        }
-
-    });
-
-    if(isAllDataValid){
-        await signUp(newUserObj);
+    }catch(error){
+        console.log(error);
+        ui.displayAlert('error', 'Please try again later', 'Ups! Something went wrong');
     }
 });
 
 //handle inputs validations on blur event
 [...formInputs].forEach(input => {
     input.addEventListener('blur', (e)=> {
+        
+    });
+});
 
-        const input = e.target;
-
-        const isValid = handleValidation(input);
-
-        if(isValid){
-            ui.removeErrorOnField(input);
-        }
-
+//handle inputs on focus event
+[...formInputs].forEach(input => {
+    input.addEventListener('focus', (e)=> {
+        ui.removeErrorOnField(e.target);
     });
 });

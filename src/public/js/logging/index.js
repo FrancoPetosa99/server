@@ -25,49 +25,37 @@ async function login(email, password){
     bodyRequest.email = email;
     bodyRequest.password = password;
 
-    const response = await fetch(`http://localhost:8080/api/session`, {
+    return fetch(`http://localhost:8080/api/session`, {
         method: httpMethod,
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(bodyRequest)
     })
-    .then((res) => checkStatusCode(res))
-    .then((res)=> res.json())
 
-    ui.displayAlert('success', response.message);
-
-    setTimeout(()=> {
-        window.location.href = 'http://localhost:8080/api/views/logging';
-    }, 2500)
+    // setTimeout(()=> {
+    //     window.location.href = 'http://localhost:8080/api/views/logging';
+    // }, 2500)
 
 }
 
-function handleValidationInput(input){
+function handleAPIResponse(statusCode, data){
+    const alert = {};
 
-    let validationPassed = true;
-
-    const inputValue = input.value;
-   
-    if(!inputValue){
-
-        ui.setErrorOnField(input);
-        validationPassed = false;
-
+    if(statusCode !== 200){
+        alert.type = 'error';
+        if(statusCode !== 500){
+            alert.message = data.error.message;
+        }else{
+            alert.message = 'Ups! Something went wrong. Please try again later';
+        }
     }else{
-        ui.removeErrorOnField(input);
+        alert.type = 'success';
+        alert.message = data.message;
+        setTimeout(()=> window.location.href = 'http://localhost:8080/api/views/home', 1500);
     }
 
-    return validationPassed;
-}
-
-function checkStatusCode(res){
-
-    if(res.status == 400){
-        throw new Error(`Incorrect email address and password`);
-    }
-
-    return res
+    ui.displayAlert(alert.type, alert.message);
 }
 /********************************************/
 //MAIN CODE
@@ -80,40 +68,26 @@ function checkStatusCode(res){
 
 btnLogin.addEventListener('click', async ()=> {
     try{
-        ui.handleBtnLoading();
-
         const email = inputEmail.value;
         const password = inputPassword.value;
 
-        const isPasswordValid = handleValidationInput(inputPassword);
-        const isEmailValid = handleValidationInput(inputEmail);
-        
+        ui.handleBtnLoading();
+        const response = await login(email, password);
+        ui.handleBtnLoading();
 
-        if(isEmailValid && isPasswordValid){
-            await login(email, password);
-        }
-    
+        const data = await response.json();
+
+        handleAPIResponse(response.status, data);
+
         
     }catch(error){
-
-        ui.displayAlert('error', error.message);
-
-    }finally{
-        ui.handleBtnLoading();
+        ui.displayAlert('error', 'Ups! Something went wrong. Please try again later. ');
     }
 });
 
 //handle input validation on blur event
 [inputEmail, inputPassword].forEach(input => {
     input.addEventListener('blur', (e)=> {
-
-        const input = e.target;
-
-        const validationPassed = handleValidationInput(input);
-
-        if(validationPassed){
-            ui.removeErrorOnField(input);
-        }
-
+        
     });
 });

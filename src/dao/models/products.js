@@ -16,8 +16,13 @@ const dataModelObj = {
     available: Boolean
 };
 
+const schemaConfigObj = {
+    timestamps: false,
+    versionKey: false
+};
+
 //INSTANCE SCHEMA OBJ
-const schema = new mongoose.Schema(dataModelObj);
+const schema = new mongoose.Schema(dataModelObj, schemaConfigObj);
 
 //ADD PLUGIN TO SCHEMA (OPTIONAL)
 schema.plugin(mongoosePaginate);

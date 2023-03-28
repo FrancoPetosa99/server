@@ -49,6 +49,10 @@
     color:  red;
 }
 
+.error-input{
+    border: solid 1px red;
+}
+
 .invisible{
     opacity: 0;
 }

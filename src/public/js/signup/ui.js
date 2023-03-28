@@ -4,9 +4,10 @@ function UI(){
 
     const container = document.getElementById('container');
 
-    function displayAlert(type, message){
+    function displayAlert(type, message, title){
         Swal.fire({
             toast: true,
+            title: title,
             text: message,
             position: 'bottom-end',
             icon: type,
@@ -32,15 +33,17 @@ function UI(){
         container.classList.remove('hide');
     }
 
-    function setErrorOnField(input){
+    function setErrorOnField(inputName, errorMessage){
 
-        const name = input.name;
+        const input = document.querySelector(`[name = ${inputName}]`);
+
+        input.classList.add('error-input');
        
         const parent = input.parentNode;
 
         const p = parent.querySelector('.error-message');
 
-        p.textContent = `The ${name} is a required field`;
+        if(errorMessage) p.textContent = errorMessage;
 
         p.classList.remove('invisible');
 
@@ -48,6 +51,8 @@ function UI(){
 
     function removeErrorOnField(input){
 
+        input.classList.remove('error-input');
+        
         const parent = input.parentNode;
 
         const p = parent.querySelector('.error-message');

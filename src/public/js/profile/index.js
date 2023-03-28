@@ -10,6 +10,7 @@ const btnLogOut = document.getElementById('btnLogOut');
 const userEmail = document.getElementById('user-email');
 const userName= document.getElementById('user-name');
 const userLastName = document.getElementById('user-lastname');
+const userBirthdate = document.getElementById('user-birthdate')
 
 /********************************************/
 //GLOBAL VARIABLES
@@ -19,7 +20,7 @@ const userLastName = document.getElementById('user-lastname');
 //HELPER FUNCTIONS
 /********************************************/
 async function getUserData(){
-    return fetch('http://localhost:8080/api/users/profile')
+    return fetch('http://localhost:8080/api/session/current')
     .then((res)=> res.json());
 }
 
@@ -27,7 +28,7 @@ function logOut(){
     fetch('http://localhost:8080/api/session/logout')
     .then((res)=> res.json())
     .then((data)=> ui.displayAlert('success', data.message))
-    .then(setTimeout(()=> window.location.href = 'http://localhost:8080/api/views/logging', 500))
+    .then(setTimeout(()=> window.location.href = 'http://localhost:8080/api/views/logging', 1000))
     .catch((error)=> ui.displayAlert('error', error.message));
 }
 /********************************************/
@@ -36,11 +37,14 @@ function logOut(){
 try{
 
     const response = await getUserData();
-    const { email, firstName, lastName } = response.data;
+    const { email, firstName, lastName, birthdate } = response.data;
 
     userEmail.textContent = email;
     userName.textContent = firstName;
     userLastName.textContent = lastName;
+    userBirthdate.textContent = birthdate;
+
+
 
     ui.displayAlert('success', `Welcome ${firstName}!`);
 

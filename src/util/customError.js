@@ -1,0 +1,6 @@
+function CustomError(statusCode, message){
+    this.statusCode = statusCode;
+    this.message = message;
+}
+
+export default CustomError;

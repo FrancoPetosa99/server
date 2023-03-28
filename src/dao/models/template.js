@@ -11,8 +11,14 @@ const dataModelObj = {
     'PROPERTY NAME': 'VALUE TYPE'
 };
 
+//OPTIONAL
+const schemaConfigObj = {
+    timestamps: false,
+    versionKey: false
+};
+
 //INSTANCE SCHEMA OBJ
-const schema = new mongoose.Schema(dataModelObj);
+const schema = new mongoose.Schema(dataModelObj, schemaConfigObj);
 
 //INSTANCE SCHEMA MODEL
 const model = mongoose.model(collection, schema);
