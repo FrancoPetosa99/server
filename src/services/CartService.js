@@ -1,5 +1,4 @@
-import cartManager from "../dao/CartManager.js";
-import productManager from "../dao/ProductManager.js";
+import { cartDB, productDB } from "../dao/index.js";
 
 class CartService{
 
@@ -7,7 +6,7 @@ class CartService{
 
     async getCarts(limit = 50){
 
-        const carts = await cartManager.getAll();
+        const carts = await cartDB.getAll();
 
         const limitedCartList = carts.slice(0, limit);
     
@@ -24,11 +23,11 @@ class CartService{
 
         // if(!isValidProductId) throw new Error(`The product id ${productId} is not valid. Must be hexadecimal number with 24 characters`);
 
-        // const product = await productManager.getById(productId);
+        // const product = await productDB.getById(productId);
 
         // if(!product) throw new Error(`The product id ${productId} does not exist`);
 
-        const newCart = await cartManager.create();
+        const newCart = await cartDB.create();
 
         return newCart;
     }
@@ -39,7 +38,7 @@ class CartService{
 
         if(!isValidId) throw new Error(`The id ${id} is not valid. Must be an hexadecimal number of 24 characters`);
 
-        const cart = await cartManager.getById(id);
+        const cart = await cartDB.getById(id);
 
         if(!cart) throw new Error(`The cart with id ${id} could not be found`);
 
@@ -69,7 +68,7 @@ class CartService{
             productsArr.push(newProduct);
         }
 
-        const updatedCart = await cartManager.updateCartProducts(cartId, productsArr);
+        const updatedCart = await cartDB.updateCartProducts(cartId, productsArr);
 
         return updatedCart;
     }
@@ -82,14 +81,14 @@ class CartService{
 
         if(!product) throw new Error(`product with id ${product.id} could not be found on cart with id ${cartId}`);
 
-        const productExist = await productManager.checkProductExist(productId);
+        const productExist = await productDB.checkProductExist(productId);
 
         if(!productExist) throw new Error(`product with id ${product.product} could not be found on data base`);
 
         
         const newProductsArr = cartObj.products.filter(product => product.id != productId);
 
-        await cartManager.deleteProductFromCart(cartId, newProductsArr);
+        await cartDB.deleteProductFromCart(cartId, newProductsArr);
     }
 
     async deleteCart(id){
@@ -98,7 +97,7 @@ class CartService{
 
         if(!product) throw new Error(`The product with id ${id} could not be found`);
 
-        await productManager.deleteById(id);
+        await productDB.deleteById(id);
     }
 
     async emptyCart(id){
@@ -107,14 +106,14 @@ class CartService{
 
         if(!isValidId) throw new Error(`The id ${id} is not valid. Must be an hexadecimal number of 24 characters`);
 
-        const cartExist = await cartManager.checkCartExist(id);
+        const cartExist = await cartDB.checkCartExist(id);
 
         if(!cartExist) throw new Error(`The cart id ${id} could not be found`);
 
         const updateObj = {};
         updateObj.products = [];
 
-        const cartObj = await cartManager.updateById(id, updateObj);
+        const cartObj = await cartDB.updateById(id, updateObj);
 
         return cartObj;
         
@@ -126,7 +125,7 @@ class CartService{
         
         if(!isValidId) throw new Error(`The id ${cartId} is not valid. Must be an hexadecimal number of 24 characters`);
         
-        const cartExist = await cartManager.checkCartExist(cartId);
+        const cartExist = await cartDB.checkCartExist(cartId);
         
         if(!cartExist) throw new Error(`The cart id ${cartId} could not be found`);
 
@@ -137,7 +136,7 @@ class CartService{
 
             const id = product.id;
 
-            return productManager.checkProductExist(id)
+            return productDB.checkProductExist(id)
             .then(productExist => {
                 if(!productExist) errorLog.push(`The product with id ${id} could not be found`);
             });
@@ -152,7 +151,7 @@ class CartService{
             return objMaped;
         });
 
-        await cartManager.updateCartProducts(cartId, mapedProductsArr);
+        await cartDB.updateCartProducts(cartId, mapedProductsArr);
     }
 
     async updateProductInCart(cartId, productId, newAmount){
@@ -171,7 +170,7 @@ class CartService{
 
         product.amount = newAmount;
 
-        await cartManager.updateCartProducts(cartId, productsArr);
+        await cartDB.updateCartProducts(cartId, productsArr);
 
     }
 
@@ -179,7 +178,7 @@ class CartService{
 
         let total = 0;
 
-        const cart = await cartManager.getById(cartId);
+        const cart = await cartDB.getById(cartId);
 
         const products = cart.products;
 

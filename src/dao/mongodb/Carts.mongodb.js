@@ -6,7 +6,7 @@ import model from "./models/carts.js";
 /********************************************/
 //CART MANAGER CLASS
 /********************************************/
-class CartManager{
+class CartDB{
 
     constructor(){
     }
@@ -158,9 +158,9 @@ class CartManager{
     }
 }
 
-const cartManager = new CartManager(); //INITIALIZE THE CART MANAGER
+const cartDB = new CartDB(); //INITIALIZE THE CART MANAGER
 
-export default cartManager;
+export default cartDB;
 
 
 

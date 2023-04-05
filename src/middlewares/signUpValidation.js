@@ -8,7 +8,7 @@ function checkUserAge(date){
     return age >= 18;
 }
 
-function checkPasswordAndConfirmPassword(password, {req}){
+function checkConfirmPassword(password, {req}){
     return password === req.body.confirmPassword;
 }
 
@@ -91,7 +91,7 @@ const signUpValidation = [
                 'Must contain one or more special characters',
                 'Must be equal to confirmPassword parameter'
         ]})
-        .custom(checkPasswordAndConfirmPassword).withMessage('Confirmation password is not correct'),
+        .custom(checkConfirmPassword).withMessage('Confirmation password is not correct'),
     body('confirmPassword')
         .exists().withMessage('Required'),
     body('birthdate')

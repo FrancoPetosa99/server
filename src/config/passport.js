@@ -1,8 +1,7 @@
 import passport from 'passport';
 import passportLocal from 'passport-local';
-// import encrypt from "../util/encrypt.js";
 import userService from '../services/UserService.js';
-import users from '../dao/models/users.js';
+import users from "../dao/mongodb/models/users.js"
 import GHStrategy from 'passport-github2';
 import jwt from 'passport-jwt';
 import cookieExtractor from '../util/cookieExtractor.js';

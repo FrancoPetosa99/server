@@ -1,7 +1,7 @@
 //modules
 import model from "./models/products.js";
 
-class ProductManager{
+class ProductDB{
 
     constructor(){
         this.populatedFields = [
@@ -157,7 +157,8 @@ class ProductManager{
     }
 }
 
-const productManager = new ProductManager();
-export default productManager;
+const productDB = new ProductDB();
+
+export default productDB;
 
 

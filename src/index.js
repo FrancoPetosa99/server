@@ -1,6 +1,7 @@
 /********************************************/
 //IMPORT MODULES
 /********************************************/
+import dotenv from "dotenv";
 import express from 'express';
 import routes from './routes/routes.js';
 import cookieParser from 'cookie-parser';
@@ -16,9 +17,16 @@ import initializePassport from './config/passport.js';
 const app = express();
 
 /********************************************/
+//SET ENVIORMENT
+/********************************************/
+if(process.env.NODE_ENV !== 'production'){
+    dotenv.config();
+}
+
+/********************************************/
 //CONFIGURABLE VARIABLES
 /********************************************/
-const port = 8080;
+const port = process.env.PORT;
 
 /********************************************/
 //RUN SERVER

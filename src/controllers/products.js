@@ -4,6 +4,7 @@
 import { Router } from "express";
 import { serverSocket } from "../index.js";
 import productService from "../services/ProductService.js";
+import { permission, authentication } from '../middlewares/index.js';
 
 const router = Router(); //INITIALIZE ROUTER
 
@@ -42,7 +43,7 @@ router.get('/:id', async (request, response)=> {
 /********************************************/
 //POST METHOD ENDPOINTS
 /********************************************/
-router.post('/', async (request, response)=> {
+router.post('/', authentication('authToken'), permission(['Admin', 'Master']), async (request, response)=> {
     try{
         const dataProductObj = request.body;
         const newProduct = await productService.createNew(dataProductObj);
@@ -56,7 +57,7 @@ router.post('/', async (request, response)=> {
 /********************************************/
 //PUT METHOD ENDPOINTS
 /********************************************/
-router.put('/:id', async (request, response)=> {
+router.put('/:id', authentication('authToken'), permission(['Admin', 'Master']), async (request, response)=> {
     try{
         const productId = request.params.id;
         const newData = request.body;
@@ -70,7 +71,7 @@ router.put('/:id', async (request, response)=> {
 /********************************************/
 //DELETE METHOD ENDPOINTS
 /********************************************/
-router.delete('/:id', async (request, response)=> {
+router.delete('/:id', authentication('authToken'), permission(['Admin', 'Master']), async (request, response)=> {
     try{
         const productId = request.params.id;
         await productService.deleteProduct(productId);

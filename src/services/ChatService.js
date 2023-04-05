@@ -1,4 +1,4 @@
-import messageManager from "../dao/MessageManager.js";
+import messageManager from "../dao/mongodb/MessageManager.js";
 
 class ChatService{
 

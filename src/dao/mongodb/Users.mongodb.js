@@ -1,13 +1,13 @@
 /********************************************/
 //IMPORT MODULES
 /********************************************/
-import users from '../dao/models/users.js'
-import CustomError from '../util/customError.js';
+import users from './models/users.js'
+import CustomError from '../../util/customError.js';
 
 /********************************************/
 //CART MANAGER CLASS
 /********************************************/
-class UserManager{
+class UserDB{
 
     constructor(){
     }
@@ -40,9 +40,11 @@ class UserManager{
             user.lastName = mongodbResponse.lastName;
             user.email = mongodbResponse.email;
             user.active = mongodbResponse.active;
+            user.role = mongodbResponse.role;
             user.password = mongodbResponse.password;
             user.id = mongodbResponse._id;
             user.birthdate = mongodbResponse.birthdate;
+            console.log(user);
             return user;
         }
         return null;
@@ -55,9 +57,9 @@ class UserManager{
     }    
 }
 
-const userManager = new UserManager(); //INITIALIZE THE CART MANAGER
+const userDB = new UserDB(); //INITIALIZE THE CART MANAGER
 
-export default userManager;
+export default userDB;
 
 
 

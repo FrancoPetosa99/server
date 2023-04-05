@@ -1,4 +1,4 @@
-import productManager from "../dao/ProductManager.js";
+import { productDB } from "../dao/index.js";
 
 class ProductService{
 
@@ -74,7 +74,7 @@ class ProductService{
             filterObj.category = categoryLowerCased;
         }
 
-        const productList = await productManager.getPagination(filterObj);
+        const productList = await productDB.getPagination(filterObj);
 
         return productList;
     }
@@ -86,7 +86,7 @@ class ProductService{
         const queryFilterObj = {};
         queryFilterObj.code = product.code;
 
-        const queryResponse = await productManager.getByFilter(queryFilterObj);
+        const queryResponse = await productDB.getByFilter(queryFilterObj);
 
         console.log(queryResponse);
 
@@ -114,7 +114,7 @@ class ProductService{
         //verify no errors occurred during the validation process 
         if(errorLog.length > 0) throw new Error(errorLog.join('\n '));
 
-        const newProduct = await productManager.create(product);
+        const newProduct = await productDB.create(product);
         
         console.log(`the product ${newProduct.title} has been added successfully`);
 
@@ -128,7 +128,7 @@ class ProductService{
 
         if(!isValidId) throw new Error(`The id ${id} is not valid. Must be an hexadecimal number of 24 characters`);
 
-        const product = await productManager.getById(id);
+        const product = await productDB.getById(id);
 
         if(!product) throw new Error(`The product with id ${id} could not be found`);
 
@@ -174,7 +174,7 @@ class ProductService{
         //verify no error has occurred during the process before writing the "db"
         if(errorLog.length > 0) throw new Error(errorLog.join('; '));
 
-       const updatedProduct = await productManager.updateById(id, newData);
+       const updatedProduct = await productDB.updateById(id, newData);
 
        return updatedProduct;
     }
@@ -185,7 +185,7 @@ class ProductService{
 
         if(!product) throw new Error(`The product with id ${id} could not be found`);
 
-        await productManager.deleteById(id);
+        await productDB.deleteById(id);
     }
 
     verifyHexaNumber(hexaNumber){

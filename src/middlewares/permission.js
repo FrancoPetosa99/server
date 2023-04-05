@@ -1,6 +1,6 @@
 function permission(roles){
     
-    roles = roles || ['Standard', 'Admin', 'Premium'];
+    roles = roles || ['Standard', 'Admin', 'Premium', 'Master'];
 
     return function(request, response, next){
 
@@ -8,8 +8,11 @@ function permission(roles){
 
             //check the client has permissions
             const userRole = request.user.role;
+            console.log('user role:', userRole);
+            console.log(roles);
             const isRoleValid = roles.includes(userRole);
-            if(isRoleValid){
+            console.log('role valid', isRoleValid);
+            if(!isRoleValid){
                 return response
                 .status(403)
                 .json({

@@ -4,18 +4,19 @@ import categories from '../controllers/categories.js';
 import carts from '../controllers/carts.js';
 import chats from '../controllers/chats.js';
 import views from '../controllers/views.js';
-import session from '../controllers/session.js'
+import session from '../controllers/session.js';
+import { HTTPMethod } from '../middlewares/index.js';
 
 const routes = (app)=>  {
-    app.use('/api/products', products);
-    app.use('/api/users', users);
-    app.use('/api/categories', categories);
-    app.use('/api/carts', carts);
+    app.use('/api/products', HTTPMethod(['GET', 'POST', 'PATCH', 'DELETE']), products);
+    app.use('/api/users', HTTPMethod(['GET', 'POST', 'PATCH']), users);
+    app.use('/api/categories', HTTPMethod(['GET', 'POST', 'PATCH', 'DELETE']), categories);
+    app.use('/api/carts', HTTPMethod(['GET', 'POST', 'PATCH', 'DELETE']), carts);
     app.use('/api/chats', chats);
-    app.use('/api/views', views);
-    app.use('/api/session', session);
+    app.use('/api/views', HTTPMethod(['GET']), views);
+    app.use('/api/session', HTTPMethod(['GET', 'POST']), session);
 
-    //In case client rquests for a not supported resource by the API
+    //In case client requests for a not supported resource by the API
     app.use('*', (request, response)=> {
         response
         .status(404)
@@ -24,7 +25,7 @@ const routes = (app)=>  {
             error: {
                 message: 'API does not support requested resource'
             }
-        })
+        });
     });
 }
 export default routes;

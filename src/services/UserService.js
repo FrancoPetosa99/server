@@ -1,4 +1,4 @@
-import userManager from "../dao/UserManager.js";
+import { userDB } from "../dao/index.js";
 import encrypt from "../util/encrypt.js";
 import CustomError from "../util/customError.js";
 
@@ -13,7 +13,7 @@ class UserService{
         //hash password
         newUserData.password = encrypt.getHashedPassword(password);
 
-        const userData = await userManager.createUser(newUserData);
+        const userData = await userDB.createUser(newUserData);
         
         return userData;
 
@@ -21,7 +21,7 @@ class UserService{
 
     async createNewUserByThird(newUserData){
         
-        const userData = await userManager.createUser(newUserData);
+        const userData = await userDB.createUser(newUserData);
         
         return userData;
 
@@ -29,7 +29,7 @@ class UserService{
 
     async checkEmailAndPassword(email, password){
 
-        const userData = await userManager.getUserByEmail(email);
+        const userData = await userDB.getUserByEmail(email);
 
         //check user exist
         if(!userData) throw new CustomError(404, `Could not found user with email ${email}`);
@@ -52,13 +52,22 @@ class UserService{
         //encrypt new password
         const encryptedNewPassword = encrypt.getHashedPassword(newPassword);
 
-        await userManager.updatePassword(email, encryptedNewPassword);
+        await userDB.updatePassword(email, encryptedNewPassword);
 
     }
     
     async getUserData(userEmail){
 
-        const userData = await userManager.getUserByEmail(userEmail)
+        const userData = await userDB.getUserByEmail(userEmail)
+
+        if(!userData) throw new CustomError(404, `Could not found user with email ${email}`);
+
+        return userData;
+    }
+
+    async getUserDataById(id){
+
+        const userData = await userDB.getUserDataById(id)
 
         if(!userData) throw new CustomError(404, `Could not found user with email ${email}`);
 
@@ -68,7 +77,7 @@ class UserService{
     async checkUserExists(email){
         let userExist = false;
 
-        const user = await userManager.getUserByEmail(email);
+        const user = await userDB.getUserByEmail(email);
 
         if(user) userExist = true;
         

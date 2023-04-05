@@ -5,23 +5,16 @@ import { Router } from "express";
 import userService from "../services/UserService.js";
 import jwtManager from "../util/jwt.js";
 import signUpValidation from "../middlewares/signUpValidation.js";
-import { authentication } from '../middlewares/index.js'
 import CustomError from "../util/customError.js";
 
 const router = Router(); //INITIALIZE ROUTER
 
-/********************************************/
-//GET METHOD ENDPOINTS
-/********************************************/
 router.get('/failRegister', ()=> {
     const error = {};
     error.message = 'Could not create account';
     response.json(200, error);
 });
 
-/********************************************/
-//POST METHOD ENDPOINTS
-/********************************************/
 router.post('/', signUpValidation, async (request, response)=> {
     try{
         const { firstName, lastName, email, password, role } = request.body;
@@ -70,9 +63,6 @@ router.post('/', signUpValidation, async (request, response)=> {
     }
 });
 
-/********************************************/
-//PATCH METHOD ENDPOINTS
-/********************************************/
 router.patch('/', async (request, response)=> {
     
     try{
