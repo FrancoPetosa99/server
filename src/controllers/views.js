@@ -3,7 +3,7 @@
 /********************************************/
 import { Router } from "express";
 import productService from "../services/ProductService.js";
-import cartService from "../services/cartService.js";
+import cartService from "../services/CartService.js";
 import chatService from "../services/chatService.js";
 import { privateAccess, publicAccess } from '../middlewares/index.js';
 
@@ -28,16 +28,13 @@ router.get('/products/:id', async (request, response)=> {
 
 router.get('/home', async (request, response)=> {
     try{
-
-        const queryObj = request.query;
-
-        const productBatch = await productService.getProducts(queryObj);
-
-        const renderObj = {};
-        renderObj.productBatch = productBatch;
-
+        const renderObj = {
+            title: 'Home',
+            cssFileName: 'home.css',
+        };
+    
         response.render('home', renderObj);
-
+        
     }catch(error){
         response.send(`<h1>The following error has occurred: ${error.message}</h1>`);
     }

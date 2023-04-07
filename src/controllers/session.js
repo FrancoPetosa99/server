@@ -107,7 +107,7 @@ router.post('/', signInValidation, async (request, response)=> {
 
         //check if email and password are valid
         const userData = await userService.checkEmailAndPassword(email, password);
-        console.log('user:', userData);
+        
         //user credentials are valid so generate jwt token
         const token = jwtManager.generateToken(userData);
         

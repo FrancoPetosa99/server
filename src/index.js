@@ -1,7 +1,7 @@
 /********************************************/
 //IMPORT MODULES
 /********************************************/
-import dotenv from "dotenv";
+import { PORT } from './config/env.config.js';
 import express from 'express';
 import routes from './routes/routes.js';
 import cookieParser from 'cookie-parser';
@@ -17,22 +17,10 @@ import initializePassport from './config/passport.js';
 const app = express();
 
 /********************************************/
-//SET ENVIORMENT
-/********************************************/
-if(process.env.NODE_ENV !== 'production'){
-    dotenv.config();
-}
-
-/********************************************/
-//CONFIGURABLE VARIABLES
-/********************************************/
-const port = process.env.PORT;
-
-/********************************************/
 //RUN SERVER
 /********************************************/
-const httpServer = app.listen(port, ()=> console.log(`Node Server running at port: ${port}`));
-app.get('/', ( /*request, response*/ )=> console.log(`Node Server running at port: ${port}`));
+const httpServer = app.listen(PORT, ()=> console.log(`Node Server running at port: ${PORT}`));
+app.get('/', ( /*request, response*/ )=> console.log(`Node Server running at port: ${PORT}`));
 
 /********************************************/
 //MIDDLEWARE CONFIGURATIONS

@@ -44,7 +44,6 @@ class UserDB{
             user.password = mongodbResponse.password;
             user.id = mongodbResponse._id;
             user.birthdate = mongodbResponse.birthdate;
-            console.log(user);
             return user;
         }
         return null;

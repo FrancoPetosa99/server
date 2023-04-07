@@ -1,11 +1,10 @@
 import jwt from 'jsonwebtoken';
+import { JWT_SECRET_KEY } from '../config/env.config.js';
 
 function JWTManager(){
 
-    const SECRET_KEY = process.env.JWT_SECRET_KEY;
-
     function generateToken(payload){
-        const token = jwt.sign({payload}, SECRET_KEY, { expiresIn: '20m' });
+        const token = jwt.sign({payload}, JWT_SECRET_KEY, { expiresIn: '20m' });
         return token;
     }
     
