@@ -7,7 +7,7 @@ import routes from './routes/routes.js';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 // import MongoStore from 'connect-mongo';
-import connectMongodb from './db/mondodb.js';
+import connectMongodb from './db/mongodb.js';
 import handlebars from 'express-handlebars';
 import __dirname from './utils.js';
 import ServerSocket from './sockets/index.js';

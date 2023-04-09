@@ -6,6 +6,9 @@ import productService from "../services/ProductService.js";
 import cartService from "../services/CartService.js";
 import chatService from "../services/chatService.js";
 import { privateAccess, publicAccess } from '../middlewares/index.js';
+import reqURLExtractor from "../util/reqURLExtractor.js";
+import cookieExtractor from "../util/cookieExtractor.js";
+import jwtManager from "../util/jwt.js";
 
 const router = Router(); //INITIALIZE ROUTER
 
@@ -28,14 +31,29 @@ router.get('/products/:id', async (request, response)=> {
 
 router.get('/home', async (request, response)=> {
     try{
-        const renderObj = {
-            title: 'Home',
-            cssFileName: 'home.css',
-        };
-    
+        const authToken = cookieExtractor(request, 'authToken');
+        const payLoad = jwtManager.parseToken(authToken);
+        
+        const requestedURL = reqURLExtractor(request);
+        const pagination = await productService.getProducts(request.query);
+
+        console.log(pagination);
+        
+        //build render obj
+        const renderObj = {};
+        renderObj.title = 'Home';
+        renderObj.cssFileName = 'home.css';
+        renderObj.pagination = pagination;
+        if(payLoad){
+            renderObj.isAuthenticated = true;
+            renderObj.userEmail = payLoad.email;
+        }
+        // renderObj.logoutLink = 'http://localhost:8080/api/session/logout';
+
         response.render('home', renderObj);
         
     }catch(error){
+        console.log(error);
         response.send(`<h1>The following error has occurred: ${error.message}</h1>`);
     }
 });

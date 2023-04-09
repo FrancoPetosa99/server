@@ -13,7 +13,7 @@ function JWTManager(){
         let payload = null;
 
         //check the token sent on the request is valid
-        jwt.verify(token, SECRET_KEY, (error, credentials)=> {
+        jwt.verify(token, JWT_SECRET_KEY, (error, credentials)=> {
             if(error) payload = null;
             else payload = credentials.payload;
         });
@@ -24,7 +24,7 @@ function JWTManager(){
     function verifyToken(token){
         let isTokenValid = true;
 
-        jwt.verify(token, SECRET_KEY, (error)=> {
+        jwt.verify(token, JWT_SECRET_KEY, (error)=> {
             if(error) isTokenValid = false;
         });
 

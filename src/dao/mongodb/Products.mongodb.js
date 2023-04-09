@@ -59,8 +59,6 @@ class ProductDB{
             };
         }
 
-        console.log(filterObj);
-        
         const mongodbResponse = await model.paginate(filterObj, optionObj);
 
         const responseObj = {};
@@ -70,8 +68,8 @@ class ProductDB{
         responseObj.prevPage = mongodbResponse.prevPage;
         responseObj.totalProducts = mongodbResponse.totalDocs;
         responseObj.totalPages = mongodbResponse.totalPages;
-        responseObj.nextPageLink = responseObj.nextPage ? `http://localhost:8080/api/products?limit=${limit}&page=${responseObj.nextPage}&sort=${sort}` : null;
-        responseObj.prevPageLink = responseObj.prevPage ? `http://localhost:8080/api/products?limit=${limit}&page=${responseObj.prevPage}&sort=${sort}` : null;
+        responseObj.nextPageLink = responseObj.nextPage ? `http://localhost:8080/api/views/home?limit=${limit}&page=${responseObj.nextPage}&sort=${sort}` : null;
+        responseObj.prevPageLink = responseObj.prevPage ? `http://localhost:8080/api/views/home?limit=${limit}&page=${responseObj.prevPage}&sort=${sort}` : null;
         responseObj.products = mongodbResponse.docs.map(product => this.mapProductObj(product));
 
         return responseObj;
