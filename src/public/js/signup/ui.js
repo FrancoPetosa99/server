@@ -1,7 +1,5 @@
 function UI(){
     
-    const loading = document.getElementById('btn-loading');
-
     const container = document.getElementById('container');
 
     function displayAlert(type, message, title){
@@ -19,10 +17,6 @@ function UI(){
                 toast.addEventListener('mouseleave', Swal.resumeTimer)
             }
         });
-    }
-
-    function handleBtnLoading(){
-        loading.classList.toggle('fade');
     }
 
     function hideContainer(){
@@ -64,7 +58,6 @@ function UI(){
     }
 
     return {
-        handleBtnLoading,
         hideContainer,
         showContainer,
         setErrorOnField,

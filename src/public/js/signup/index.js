@@ -71,9 +71,8 @@ formSignUp.addEventListener('submit', async (e)=> {
     formData.forEach((value, key)=> newUserObj[key] = value); 
 
     try{
-        ui.handleBtnLoading();
+
         const response = await signUp(newUserObj);
-        ui.handleBtnLoading();
 
         const statusCode = response.status;
         const data = await response.json();
@@ -81,7 +80,6 @@ formSignUp.addEventListener('submit', async (e)=> {
         handleAPIResonse(statusCode, data);
 
     }catch(error){
-        console.log(error);
         ui.displayAlert('error', 'Please try again later', 'Ups! Something went wrong');
     }
 });
