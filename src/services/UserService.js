@@ -1,4 +1,5 @@
 import { userDB } from "../dao/index.js";
+import userDTO from "../dto/Users.dto.js";
 import encrypt from "../util/encrypt.js";
 import CustomError from "../util/customError.js";
 
@@ -27,9 +28,13 @@ class UserService{
 
     }
 
-    async checkEmailAndPassword(email, password){
+    async checkEmailAndPassword(credentials){
+
+        const { email, password } = credentials;
 
         const userData = await userDB.getUserByEmail(email);
+
+        console.log(userData);
 
         //check user exist
         if(!userData) throw new CustomError(404, `Could not found user with email ${email}`);
@@ -37,7 +42,7 @@ class UserService{
         //check passwords matches
         const passwordMatch = encrypt.checkPassword(password, userData.password);
            
-        if(!passwordMatch)  throw new CustomError(401, `Email and password are not correct`);
+        if(!passwordMatch)  throw new CustomError(401, 'Email and password are not correct');
 
         return userData;
     }
@@ -56,7 +61,7 @@ class UserService{
 
     }
     
-    async getUserData(userEmail){
+    async getUserByEmail(userEmail){
 
         const userData = await userDB.getUserByEmail(userEmail)
 

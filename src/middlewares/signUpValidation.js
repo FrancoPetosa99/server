@@ -98,6 +98,8 @@ const signUpValidation = [
         .exists().withMessage('Required')
         .isDate('YYYY/MM/DD').withMessage('Date format must be YY/MM/DD')
         .custom(checkUserAge).withMessage('Users must be at least 18 years old'),
+    
+    //once validations process are completed...
     (request, response, next) => {
 
         const { errors } = validationResult(request);

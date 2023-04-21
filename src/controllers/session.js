@@ -4,6 +4,7 @@
 import { Router } from "express";
 import passport from "passport";
 import userService from "../services/UserService.js";
+import userDTO from "../dto/Users.dto.js";
 import jwtManager from "../util/jwt.js";
 import signInValidation from "../middlewares/signInValidation.js";
 import authentication from "../middlewares/authentication.js";
@@ -59,24 +60,16 @@ router.get('/current', authentication('authToken'), async (request, response)=> 
     try{
 
         const userEmail = request.user.email;
-        const userData = await userService.getUserData(userEmail);
+        const userData = await userService.getUserByEmail(userEmail);
 
-        const { email, firstName, lastName, birthdate, id, active } = userData;
-
-        const mapUserObj = {};
-        mapUserObj.email = email;
-        mapUserObj.firstName = firstName;
-        mapUserObj.lastName = lastName;
-        mapUserObj.birthdate = birthdate;
-        mapUserObj.id = id;
-        mapUserObj.active = active;
+        const userPublicData = userDTO.public(userData);
 
        //send response to client and the access token by cookies
        response
        .status(200)
        .json({
             status: 'Success',
-            data: mapUserObj
+            data: userPublicData
        });
 
     }catch(error){
@@ -103,13 +96,16 @@ router.get('/current', authentication('authToken'), async (request, response)=> 
 router.post('/', signInValidation, async (request, response)=> {
     try{
 
-        const { email, password } = request.body;
+        const credentials = userDTO.loggin(request.body);
 
         //check if email and password are valid
-        const userData = await userService.checkEmailAndPassword(email, password);
+        const userData = await userService.checkEmailAndPassword(credentials);
         
+        //avoids put into the token sensitive user data
+        const userTokenData = userDTO.token(userData);
+
         //user credentials are valid so generate jwt token
-        const token = jwtManager.generateToken(userData);
+        const token = jwtManager.generateToken(userTokenData);
         
         //send response to client and token by cookies
         response

@@ -1,7 +1,6 @@
 /********************************************/
 //IMPORT MODULES
 /********************************************/
-import users from './models/users.js'
 import CustomError from '../../util/customError.js';
 
 class UserDB{
@@ -11,8 +10,7 @@ class UserDB{
 
     async createUser(newUserData){
         try{
-            const newUser = await users.create(newUserData);
-            return newUser;
+            //HERE GOES MYSQL DATA BASE ACCESS LOGIC
 
         }catch(error){
             throw new CustomError(`An unexpected error has occurred`, 500);
@@ -21,8 +19,7 @@ class UserDB{
 
     async getUserByEmail(userEmail){
         try{
-            const user = await users.findOne({email: userEmail});
-            return user;
+            //HERE GOES MYSQL DATA BASE ACCESS LOGIC
 
         }catch(error){
             throw new CustomError(`An unexpected error has occurred`, 500);
@@ -31,16 +28,12 @@ class UserDB{
 
     async updatePassword(email, newPassword){
         try{
-
-            const mongodbResponse = users.updateOne({ email }, { password: newPassword});
-            console.log(mongodbResponse);
-
-            return mongodbResponse;
+            //HERE GOES MYSQL DATA BASE ACCESS LOGIC
 
         }catch(error){
             throw new CustomError(`An unexpected error has occurred`, 500);
-        }        
-    }
+        }   
+    }    
 }
 
 const userDB = new UserDB(); //INITIALIZE THE CART MANAGER

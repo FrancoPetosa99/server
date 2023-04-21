@@ -37,8 +37,6 @@ router.get('/home', async (request, response)=> {
         const requestedURL = reqURLExtractor(request);
         const pagination = await productService.getProducts(request.query);
 
-        console.log(pagination);
-        
         //build render obj
         const renderObj = {};
         renderObj.title = 'Home';
@@ -48,8 +46,9 @@ router.get('/home', async (request, response)=> {
             renderObj.isAuthenticated = true;
             renderObj.userEmail = payLoad.email;
         }
-        // renderObj.logoutLink = 'http://localhost:8080/api/session/logout';
 
+        console.log(renderObj.pagination);
+        
         response.render('home', renderObj);
         
     }catch(error){

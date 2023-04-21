@@ -26,11 +26,11 @@ router.get('/', async (request, response)=> {
 
 });
 
-router.get('/:id', async (request, response)=> {
+router.get('/:code', async (request, response)=> {
     try{
-        const id = isNaN(request.params.id) ? request.params.id : parseInt(request.params.id);
+        const code = request.params.code;
 
-        const product = await productService.getProductByID(id);
+        const product = await productService.getProductByCode(code);
         
         response.json(200, product);
 

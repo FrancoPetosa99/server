@@ -35,7 +35,7 @@ const dataModelObj = {
 
 const schemaConfigObj = {
     timestamps: false,
-    versionKey: false
+    versionKey: false,
 };
 
 const schema = new mongoose.Schema(dataModelObj, schemaConfigObj);

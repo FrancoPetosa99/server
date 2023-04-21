@@ -3,13 +3,16 @@
 /********************************************/
 import { Router } from "express";
 import cartService from "../services/CartService.js";
+import productService from "../services/ProductService.js";
+import { permission, authentication } from '../middlewares/index.js';
+
 
 const router = Router(); //INITIALIZE ROUTER
 
 /********************************************/
 //GET METHOD ENDPOINTS
 /********************************************/
-router.get('/', async (request, response)=> {
+router.get('/', authentication('authToken'), permission(['Admin', 'Master']) ,async (request, response)=> {
     try{
         const cartList = await cartService.getCarts();
         response.json(200, cartList);
@@ -18,7 +21,7 @@ router.get('/', async (request, response)=> {
     }
 });
 
-router.get('/:cid', async (request, response)=> {
+router.get('/:cid', authentication('authToken'), permission(['Admin', 'Master']), async (request, response)=> {
     try{
         const cartId = request.params.cid;
         const cart = await cartService.getCartById(cartId);
@@ -31,38 +34,39 @@ router.get('/:cid', async (request, response)=> {
 /********************************************/
 //POST METHOD ENDPOINTS
 /********************************************/
-router.post('/', async (request, response)=> {
+router.post('/product/:pcode', authentication('authToken'), async (request, response)=> {
     try{
+        const productCode = request.params.pcode;
+        const cartId = request.user.cartId;
 
-        // const productObj = {};
-        // productObj.id = request.body.productId;
-        // productObj.amount = request.body.productAmount;
+        const product = await productService.getProductByCode(productCode);
+        console.log(product.id);
 
-        const newCart = await cartService.createNewCart();
+        await cartService.addProduct(cartId, product.id);
 
-        const responseObj = {};
-        responseObj.data = newCart;
+        //send response to client
+        response
+        .status(200)
+        .json({
+            status: 'Success',
+            message: 'Product successfully added to cart'
+        });
 
-        response.json(200, responseObj);
     }catch(error){
-        response.json(400, 'An error occurred during process:' + error.message);
-    }
-});
+        //handle error response
 
-router.post('/:cid/product/:pid', async (request, response)=> {
-    try{
-        const cartId = request.params.cid;
-        const productId = request.params.pid;
-    
-        const cartUpdated = await cartService.addProduct(cartId, productId);
+        const statusCode = error.statusCode || 500;
+        const message = error.message || 'An unexpected error has ocurred';
 
-        const responseObj = {};
-        responseObj.data = cartUpdated;
-        responseObj.message = 'Product successfully added';
-
-        response.json(201, responseObj);
-    }catch(error){
-        response.json(400, 'An error occurred during process:' + error.message);
+        //send response to client
+        response
+        .status(statusCode)
+        .json({
+            status: 'Error',
+            error: {
+                message: message
+            }
+        });
     }
 });
 

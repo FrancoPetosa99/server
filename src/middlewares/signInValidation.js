@@ -15,6 +15,8 @@ const signInValidation = [
         .isEmail().withMessage('Must be a valid email address'),
     body('password')
         .exists().withMessage('Required'),
+        
+    //once validations process are completed...
     (request, response, next) => {
         const { errors } = validationResult(request);
         

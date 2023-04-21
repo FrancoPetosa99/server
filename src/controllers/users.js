@@ -3,6 +3,7 @@
 /********************************************/
 import { Router } from "express";
 import userService from "../services/UserService.js";
+import userDTO from "../dto/Users.dto.js";
 import jwtManager from "../util/jwt.js";
 import signUpValidation from "../middlewares/signUpValidation.js";
 import CustomError from "../util/customError.js";
@@ -17,24 +18,20 @@ router.get('/failRegister', ()=> {
 
 router.post('/', signUpValidation, async (request, response)=> {
     try{
-        const { firstName, lastName, email, password, role } = request.body;
+        const newUserData = userDTO.newUser(request.body);
 
-        const userExist = await userService.checkUserExists(email);
+        const userExist = await userService.checkUserExists(newUserData.email);
 
-        if(userExist) throw new CustomError(400, `Already exist user with email ${email}`);
+        if(userExist) throw new CustomError(400, `Already exist user with email ${newUserData.email}`);
 
-        const newUserData = {};
-        newUserData.firstName = firstName;
-        newUserData.lastName = lastName;
-        newUserData.email = email;
-        newUserData.password = password;
-        newUserData.role = role;
-        
         //create user on data base
         const userData = await userService.createNewUser(newUserData);
 
+        //avoids put into the token sensitive user data
+        const userTokenData = userDTO.token(userData);
+
         //generate jwt token and send to client by cookies
-        const token = jwtManager.generateToken(userData);
+        const token = jwtManager.generateToken(userTokenData);
         
         //send response to client and the access token by cookies
         response
@@ -63,32 +60,39 @@ router.post('/', signUpValidation, async (request, response)=> {
     }
 });
 
-router.patch('/', async (request, response)=> {
+router.patch('/passwordReset', async (request, response)=> {
     
     try{
-        
-        const { email, newPassword, oldPassword } = request.body;
+        const credentials = userDTO.resetPassword(request.body);
 
-        const userData = {};
-        userData.email = email;
-        userData.oldPassword = oldPassword;
-        userData.newPassword = newPassword;
-
-        await userService.resetPassword(userData);
+        await userService.resetPassword(credentials);
 
         const responseObj = {};
         responseObj.message = 'Password successfully updated';
     
-        response.json(200, responseObj);
+        //send response to client
+        response
+        .status(200)
+        .json({
+            status: 'Success',
+            message: 'Password successfully updated'
+        });
         
     }catch(error){
-        //build error response
-        const errorResponseObj = {};
-        errorResponseObj.status = 'Error';
-        errorResponseObj.error = error.message || 'An unexpected error has ocurred';
+        //handle error response
+
+        const statusCode = error.statusCode || 500;
+        const message = error.message || 'An unexpected error has ocurred';
 
         //send response to client
-        response.json(500, errorResponseObj);
+        response
+        .status(statusCode)
+        .json({
+            status: 'Error',
+            error: {
+                message: message
+            }
+        });
     }
 });
 

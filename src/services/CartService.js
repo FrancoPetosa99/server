@@ -1,17 +1,9 @@
 import { cartDB, productDB } from "../dao/index.js";
+import CustomError from "../util/customError.js";
 
 class CartService{
 
     constructor(){}
-
-    async getCarts(limit = 50){
-
-        const carts = await cartDB.getAll();
-
-        const limitedCartList = carts.slice(0, limit);
-    
-        return limitedCartList;
-    }
 
     async createNewCart(){
 
@@ -34,43 +26,34 @@ class CartService{
     
     async getCartById(id){
 
-        const isValidId = this.verifyHexaNumber(id);
-
-        if(!isValidId) throw new Error(`The id ${id} is not valid. Must be an hexadecimal number of 24 characters`);
-
         const cart = await cartDB.getById(id);
 
-        if(!cart) throw new Error(`The cart with id ${id} could not be found`);
+        if(!cart) throw new CustomError(404, `The cart with id ${id} could not be found`);
 
         return cart;
-
     }
 
     async addProduct(cartId, productId){
-
-        const cartObj = await this.getCartById(cartId);
-
-        const productsArr = cartObj.products;
         
-        const product = productsArr.find(product => product.id == productId);
+        const cart = await this.getCartById(cartId);
+        console.log("cart", cart);
 
+        const products = cart.products;
+        
+        const product = products.find(product => product.id == productId);
+        
         if(product) {
-
             product.amount++;
 
         }else {
-
             const newProduct = {};
-
             newProduct.id = productId;
             newProduct.amount = 1;
 
-            productsArr.push(newProduct);
+            products.push(newProduct);
         }
 
-        const updatedCart = await cartDB.updateCartProducts(cartId, productsArr);
-
-        return updatedCart;
+        await cartDB.updateProducts(cartId, products);
     }
 
     async removeProduct(cartId, productId){
@@ -187,35 +170,6 @@ class CartService{
         }
 
         return total;
-    }
-
-    verifyHexaNumber(hexaNumber){
-
-        let isNumberValid = true;
-
-        const maxLength = 24;
-
-        //list of valid characters in hexadecimal number system
-        const hexaCharacters = [
-            '0','1','2','3','4','5','6','7','8','9',
-            'a','b','c','d','e','f'
-        ];
-
-        try{
-            //verify if the number has hexadecimal characters only
-            for (let i = 0; i < hexaNumber.length; i++) {
-                const isCharacterValid = hexaCharacters.includes(hexaNumber[i]);
-                if(!isCharacterValid) throw new Error(`The character ${hexaNumber[i]} is not valid`);
-            }
-
-            //verify the hexadecimal number has 24 characters only
-            if(hexaNumber.length !== maxLength) throw new Error(`hexadecimal number does not have 24 characters`);
-
-        }catch(error){
-            isNumberValid = false;
-        }finally{
-            return isNumberValid;
-        }
     }
 }
 

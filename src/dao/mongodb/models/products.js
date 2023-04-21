@@ -18,7 +18,7 @@ const dataModelObj = {
 
 const schemaConfigObj = {
     timestamps: false,
-    versionKey: false
+    versionKey: false,
 };
 
 //INSTANCE SCHEMA OBJ

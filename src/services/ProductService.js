@@ -1,4 +1,5 @@
 import { productDB } from "../dao/index.js";
+import CustomError from "../util/customError.js";
 
 class ProductService{
 
@@ -74,52 +75,16 @@ class ProductService{
             filterObj.category = categoryLowerCased;
         }
 
-        const productList = await productDB.getPagination(filterObj);
+        const pagination = await productDB.getPagination(filterObj);
 
-        return productList;
+        return pagination;
     }
 
     async createNew(product){
         
-        const errorLog = [];
-
-        const queryFilterObj = {};
-        queryFilterObj.code = product.code;
-
-        const queryResponse = await productDB.getByFilter(queryFilterObj);
-
-        console.log(queryResponse);
-
-        const isValidCode = queryResponse.length == 0 ? true : false;
-
-        if(!isValidCode) errorLog.push(`The code ${product.code} already exist and duplicates are not allow`);
-
-        const requiredFieldsName = [
-            'title',
-            'description',
-            'price',
-            'image',
-            'code',
-            'stock',
-        ];
-
-        //verify no required field is missing
-        for (let i = 0; i < requiredFieldsName.length; i++) {
-
-            const hasProperty = product.hasOwnProperty(requiredFieldsName[i]);
-
-            if(!hasProperty || !product[requiredFieldsName[i]]) errorLog.push(`The field ${requiredFieldsName[i]} is required`);
-        }
-
-        //verify no errors occurred during the validation process 
-        if(errorLog.length > 0) throw new Error(errorLog.join('\n '));
-
         const newProduct = await productDB.create(product);
-        
-        console.log(`the product ${newProduct.title} has been added successfully`);
 
         return newProduct;
-
     }
     
     async getProductByID(id){
@@ -188,33 +153,12 @@ class ProductService{
         await productDB.deleteById(id);
     }
 
-    verifyHexaNumber(hexaNumber){
+    async getProductByCode(code){
+        const product = await productDB.getByCode(code);
 
-        let isNumberValid = true;
+        if(!product) throw new CustomError(404, `Product with code ${code} could not be found`);
 
-        const maxLength = 24;
-
-        //list of valid characters in hexadecimal number system
-        const hexaCharacters = [
-            '0','1','2','3','4','5','6','7','8','9',
-            'a','b','c','d','e','f'
-        ];
-
-        try{
-            //verify if the number has hexadecimal characters only
-            for (let i = 0; i < hexaNumber.length; i++) {
-                const isCharacterValid = hexaCharacters.includes(hexaNumber[i]);
-                if(!isCharacterValid) throw new Error(`The character ${hexaNumber[i]} is not valid`);
-            }
-
-            //verify the hexadecimal number has 24 characters only
-            if(hexaNumber.length !== maxLength) throw new Error(`hexadecimal number does not have 24 characters`);
-
-        }catch(error){
-            isNumberValid = false;
-        }finally{
-            return isNumberValid;
-        }
+        return product;
     }
 }
 

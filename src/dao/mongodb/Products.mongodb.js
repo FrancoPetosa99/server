@@ -1,41 +1,22 @@
-//modules
+/********************************************/
+//IMPORT MODULES
+/********************************************/
 import model from "./models/products.js";
+import CustomError from "../../util/customError.js";
 
 class ProductDB{
 
-    constructor(){
-        this.populatedFields = [
-            'title',
-            'description',
-            'price',
-            'image',
-            'code',
-            'stock',
-            'category',
-            'available'
-        ];
-    }
+    constructor(){}
 
     async getAll() {
+        try{
 
-        const mongodbResponse = await model.find();
+            const products = await model.find();
+            if(products) return products;
 
-        const productList = mongodbResponse.map(product => {
-
-            const populatedObj = {};
-
-            for (const key in product) {
-                if (this.populatedFields.includes(key)) {
-                    populatedObj[key] = product[key];
-                }
-            }
-
-            populatedObj.id = product._id;
-
-            return populatedObj;
-        });
-
-        return productList;
+        }catch(error){
+            throw new CustomError(`An unexpected error has occurred: ${error.message}`, 500);
+        }
     }
 
     async getPagination(queryObj){
@@ -60,98 +41,101 @@ class ProductDB{
         }
 
         const mongodbResponse = await model.paginate(filterObj, optionObj);
+        
+        const pagination = {};
+        pagination.currentPage = mongodbResponse.page;
+        pagination.nextPage = mongodbResponse.nextPage;
+        pagination.prevPage = mongodbResponse.prevPage;
+        pagination.totalProducts = mongodbResponse.totalDocs;
+        pagination.totalPages = mongodbResponse.totalPages;
+        pagination.nextPageLink = mongodbResponse.nextPage ? `http://localhost:8080/api/views/home?limit=${limit}&page=${responseObj.nextPage}&sort=${sort}` : null;
+        pagination.prevPageLink = mongodbResponse.prevPage ? `http://localhost:8080/api/views/home?limit=${limit}&page=${responseObj.prevPage}&sort=${sort}` : null;
+        pagination.products = mongodbResponse.docs.map(product => {
+            return {
+                amount: product.amount,
+                title: product.title,
+                description: product.description,
+                price: product.price,
+                image: product.image,
+                code: product.code,
+                stock: product.stock
+            }
+        });
 
-        const responseObj = {};
-
-        responseObj.currentPage = mongodbResponse.page;
-        responseObj.nextPage = mongodbResponse.nextPage;
-        responseObj.prevPage = mongodbResponse.prevPage;
-        responseObj.totalProducts = mongodbResponse.totalDocs;
-        responseObj.totalPages = mongodbResponse.totalPages;
-        responseObj.nextPageLink = responseObj.nextPage ? `http://localhost:8080/api/views/home?limit=${limit}&page=${responseObj.nextPage}&sort=${sort}` : null;
-        responseObj.prevPageLink = responseObj.prevPage ? `http://localhost:8080/api/views/home?limit=${limit}&page=${responseObj.prevPage}&sort=${sort}` : null;
-        responseObj.products = mongodbResponse.docs.map(product => this.mapProductObj(product));
-
-        return responseObj;
+        return pagination;
     }
 
     async getById(id) {
+        try{
+            const product = await model.findById(id);
+            if(product) return product;
 
-        const mongodbObjResponse = await model.findById(id).exec();
-        
-        if(mongodbObjResponse){
-            const productObj = {};
-    
-            for (const key in mongodbObjResponse) {
-                if (this.populatedFields.includes(key)) {
-                    productObj[key] = mongodbObjResponse[key];
-                }
-            }
-    
-            productObj.id = mongodbObjResponse._id;
-            return productObj;
-            
+        }catch(error){
+            throw new CustomError(`An unexpected error has occurred: ${error.message}`, 500);
         }
     }
 
-    async getByFilter(filterObj = {}) {
-        const productObj = await model.find(filterObj);
-        return productObj;
+    async getByCode(code) {
+        try{
+            const filterObj = {};
+            filterObj.code = code;
+
+            const product = await model.findOne(filterObj);    
+            if(product) return product;
+
+        }catch(error){
+            throw new CustomError(`An unexpected error has occurred: ${error.message}`, 500);
+        }
     }
 
-    async create(newProductObj) {
-        const mongodbResponse = await model.create(newProductObj);
-        return mongodbResponse;
-    }
-
-    async updateById(id, updateObj) {
-        const filterObj = {};
-        filterObj._id = id;
-
-        await model.updateOne(filterObj, updateObj);
-
-        const updatedProductObj = await this.getById(id);
-
-        return updatedProductObj;
+    async create(newProduct) {
+        try{
+            const productCreated = await model.create(newProduct);
+            return productCreated;
+        }catch(error){
+            throw new CustomError(`An unexpected error has occurred: ${error.message}`, 500);
+        }
     }
 
     async deleteById(id){
-        const filterObj = {};
-        filterObj._id = id;
-
-        const mongodbResponse = await model.deleteOne(filterObj);
-        return mongodbResponse;
+        try{
+            const filterObj = {};
+            filterObj.id = id;
+    
+            await model.deleteOne(filterObj);
+           
+        }catch(error){
+            throw new CustomError(`An unexpected error has occurred: ${error.message}`, 500);
+        }
     }
 
-    async checkProductExist(id){
-
-        let productExist = false;
-
-        const queryObj = {};
-        queryObj._id = id;
-
-        const mongodbResponse = await model.exists(queryObj);
-
-        if(mongodbResponse) productExist = true;
-
-        return productExist;
+    async deleteByCode(code){
+        try{
+            const filterObj = {};
+            filterObj.code = code;
+    
+            await model.deleteOne(filterObj);
+           
+        }catch(error){
+            throw new CustomError(`An unexpected error has occurred: ${error.message}`, 500);
+        }
     }
 
-    mapProductObj(productObj) {
+    async checkProductExist(code){
+        try{
+            let productExist = false;
 
-        const mapedObjProduct = {};
+            const queryObj = {};
+            queryObj.code = code;
 
-        mapedObjProduct.amount = productObj.amount;
+            const mongodbResponse = await model.exists(queryObj);
+            if(mongodbResponse) productExist = true;
 
-        mapedObjProduct.id = productObj._id;
-        mapedObjProduct.title = productObj.title;
-        mapedObjProduct.description = productObj.description;
-        mapedObjProduct.price = productObj.price;
-        mapedObjProduct.image = productObj.image;
-        mapedObjProduct.code = productObj.code;
-        mapedObjProduct.stock = productObj.stock
+            return productExist;
 
-        return mapedObjProduct;
+        }catch(error){
+            throw new CustomError(`An unexpected error has occurred: ${error.message}`, 500);
+        }   
     }
 }
 
