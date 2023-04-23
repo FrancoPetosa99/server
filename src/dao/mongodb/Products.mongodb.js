@@ -48,8 +48,8 @@ class ProductDB{
         pagination.prevPage = mongodbResponse.prevPage;
         pagination.totalProducts = mongodbResponse.totalDocs;
         pagination.totalPages = mongodbResponse.totalPages;
-        pagination.nextPageLink = mongodbResponse.nextPage ? `http://localhost:8080/api/views/home?limit=${limit}&page=${responseObj.nextPage}&sort=${sort}` : null;
-        pagination.prevPageLink = mongodbResponse.prevPage ? `http://localhost:8080/api/views/home?limit=${limit}&page=${responseObj.prevPage}&sort=${sort}` : null;
+        pagination.nextPageLink = mongodbResponse.nextPage ? `http://localhost:8080/api/views/home?limit=${limit}&page=${mongodbResponse.nextPage}&sort=${sort}` : null;
+        pagination.prevPageLink = mongodbResponse.prevPage ? `http://localhost:8080/api/views/home?limit=${limit}&page=${mongodbResponse.prevPage}&sort=${sort}` : null;
         pagination.products = mongodbResponse.docs.map(product => {
             return {
                 amount: product.amount,

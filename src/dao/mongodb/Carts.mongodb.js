@@ -13,7 +13,8 @@ class CartDB{
 
     async getById(id) {
         try{
-            const cart = await model.findById(id);
+            const cart = await model.findOne({_id: id}).populate('products.product');
+            console.log(cart);
             if(cart) return cart;
             
         }catch(error){
@@ -21,25 +22,45 @@ class CartDB{
         }
     }
 
-    async create() {
+    async createCart() {
         try{
-            const cartObj = {};
-            cartObj.products = [];
-
-            const newCart = await model.create(cartObj);
-            if(newCart) return newCart.id;
+            const newCart = await model.create({});
+            if(newCart) return newCart._id;
 
         }catch(error){
             throw new CustomError(`An unexpected error has occurred: ${error.message}`, 500);
         }    
     }
     
-    async updateProducts(cartId, products){
+    async addProduct(cartId, product){
         try{
-            const updateObj = {};
-            updateObj.products = products;
+        
+            await model.updateOne({_id: cartId}, 
+                { $set: { "products.$[product].amount": product.amount } },
+                {
+                    arrayFilters: [{ 'product._id': product.id}]
+                }
+            );
 
-            await this.updateById(cartId, updateObj);
+        }catch(error){
+            throw new CustomError(`An unexpected error has occurred: ${error.message}`, 500);
+        }
+    }
+
+    async insertNewProduct(cartId, productId){
+        try{
+        
+            await model.updateOne(
+                { _id: cartId },
+                { 
+                    $push: { 
+                        products: { 
+                            _id: productId, 
+                            amount: 1 
+                        } 
+                    } 
+                },
+            );
 
         }catch(error){
             throw new CustomError(`An unexpected error has occurred: ${error.message}`, 500);
@@ -63,6 +84,3 @@ class CartDB{
 const cartDB = new CartDB(); //INITIALIZE THE CART MANAGER
 
 export default cartDB;
-
-
-

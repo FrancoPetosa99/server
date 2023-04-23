@@ -44,7 +44,6 @@ router.post('/', signUpValidation, async (request, response)=> {
 
     }catch(error){
         //handle error response
-
         const statusCode = error.statusCode || 500;
         const message = error.message || 'An unexpected error has ocurred';
 

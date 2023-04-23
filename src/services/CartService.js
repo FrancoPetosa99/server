@@ -35,25 +35,20 @@ class CartService{
 
     async addProduct(cartId, productId){
         
+        console.log(productId);
         const cart = await this.getCartById(cartId);
-        console.log("cart", cart);
 
         const products = cart.products;
         
         const product = products.find(product => product.id == productId);
-        
+   
         if(product) {
             product.amount++;
+            await cartDB.addProduct(cartId, product);
 
         }else {
-            const newProduct = {};
-            newProduct.id = productId;
-            newProduct.amount = 1;
-
-            products.push(newProduct);
+            await cartDB.insertNewProduct(cartId, productId);
         }
-
-        await cartDB.updateProducts(cartId, products);
     }
 
     async removeProduct(cartId, productId){

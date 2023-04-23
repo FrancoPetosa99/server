@@ -40,7 +40,6 @@ router.post('/product/:pcode', authentication('authToken'), async (request, resp
         const cartId = request.user.cartId;
 
         const product = await productService.getProductByCode(productCode);
-        console.log(product.id);
 
         await cartService.addProduct(cartId, product.id);
 
@@ -54,7 +53,6 @@ router.post('/product/:pcode', authentication('authToken'), async (request, resp
 
     }catch(error){
         //handle error response
-
         const statusCode = error.statusCode || 500;
         const message = error.message || 'An unexpected error has ocurred';
 

@@ -46,9 +46,7 @@ router.get('/home', async (request, response)=> {
             renderObj.isAuthenticated = true;
             renderObj.userEmail = payLoad.email;
         }
-
-        console.log(renderObj.pagination);
-        
+                
         response.render('home', renderObj);
         
     }catch(error){

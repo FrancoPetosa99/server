@@ -30,11 +30,6 @@ const schemaConfigObj = {
 //INSTANCE SCHEMA OBJ
 const schema = new mongoose.Schema(dataModelObj, schemaConfigObj);
 
-//DEFINE MIDDLEWARE FOR SCHEMA
-schema.pre('findOne', function() {
-    this.populate('products.product');
-});
-
 //INSTANCE SCHEMA MODEL
 const model = mongoose.model(collection, schema);
 

@@ -23,6 +23,9 @@ import { body, validationResult } from "express-validator";
 
         category Required
                  String
+        
+        available: Required
+                   Boolean
 
 */
 
@@ -45,6 +48,9 @@ const productValidation = [
     body('category')
         .exists().withMessage('Required')
         .isString().withMessage('Must be a string value'),
+    body('available')
+        .exists().withMessage('Required')
+        .isBoolean().withMessage('Must be a boolean value'),
     
     //once validations process are completed...
     (request, response, next) => {

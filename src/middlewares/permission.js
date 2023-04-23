@@ -3,15 +3,12 @@ function permission(roles){
     roles = roles || ['Standard', 'Admin', 'Premium', 'Master'];
 
     return function(request, response, next){
-
         try{
 
             //check the client has permissions
             const userRole = request.user.role;
-            console.log('user role:', userRole);
-            console.log(roles);
             const isRoleValid = roles.includes(userRole);
-            console.log('role valid', isRoleValid);
+
             if(!isRoleValid){
                 return response
                 .status(403)

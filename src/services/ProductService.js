@@ -80,9 +80,14 @@ class ProductService{
         return pagination;
     }
 
-    async createNew(product){
-        
-        const newProduct = await productDB.create(product);
+    async createNew(newProductData){
+        const { code } = newProductData;
+
+        const duplicatedProduct = await productDB.getByCode(code);
+
+        if(duplicatedProduct) throw new CustomError(400, `Product with code ${code} already exist`);
+
+        const newProduct = await productDB.create(newProductData);
 
         return newProduct;
     }

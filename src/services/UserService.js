@@ -1,5 +1,4 @@
-import { userDB } from "../dao/index.js";
-import userDTO from "../dto/Users.dto.js";
+import { userDB, cartDB } from "../dao/index.js";
 import encrypt from "../util/encrypt.js";
 import CustomError from "../util/customError.js";
 
@@ -14,10 +13,14 @@ class UserService{
         //hash password
         newUserData.password = encrypt.getHashedPassword(password);
 
+        //assign cart
+        const newCart = await cartDB.createCart();
+        newUserData.cartId = newCart._id;
+
+        //save new user on db
         const userData = await userDB.createUser(newUserData);
         
         return userData;
-
     }
 
     async createNewUserByThird(newUserData){
