@@ -13,7 +13,7 @@ const dataModelObj = {
     code: Number,
     stock: Number,
     category: String,
-    available: Boolean
+    available: Boolean,
 };
 
 const schemaConfigObj = {

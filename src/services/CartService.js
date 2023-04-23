@@ -34,13 +34,11 @@ class CartService{
     }
 
     async addProduct(cartId, productId){
-        
-        console.log(productId);
         const cart = await this.getCartById(cartId);
 
         const products = cart.products;
         
-        const product = products.find(product => product.id == productId);
+        const product = products.find(product => product.product == productId);
    
         if(product) {
             product.amount++;

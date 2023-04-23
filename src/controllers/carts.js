@@ -25,7 +25,14 @@ router.get('/:cid', authentication('authToken'), permission(['Admin', 'Master'])
     try{
         const cartId = request.params.cid;
         const cart = await cartService.getCartById(cartId);
-        response.json(200, cart);
+        //send response to client
+        response
+        .status(200)
+        .json({
+            status: 'Success',
+            data: cart,
+            message: 'Account successfully created',
+        });
     }catch(error){
         response.json(400, 'An error occurred during process:' + error.message);
     }
