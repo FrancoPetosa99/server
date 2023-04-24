@@ -75,6 +75,40 @@ router.post('/product/:pcode', authentication('authToken'), async (request, resp
     }
 });
 
+router.post('/purchase', authentication('authToken'), async (request, response)=> {
+    try{
+        const cartId = request.user.cartId;
+
+        const cart = await cartService.purchase(cartId);
+        
+
+        
+
+        //send response to client
+        response
+        .status(200)
+        .json({
+            status: 'Success',
+            data: cart,
+            message: 'Purchase successfully completed'
+        });
+
+    }catch(error){
+        //handle error response
+        const statusCode = error.statusCode || 500;
+        const message = error.message || 'An unexpected error has ocurred';
+
+        //send response to client
+        response
+        .status(statusCode)
+        .json({
+            status: 'Error',
+            error: {
+                message: message
+            }
+        });
+    }
+});
 /********************************************/
 //PUT METHOD ENDPOINTS
 /********************************************/

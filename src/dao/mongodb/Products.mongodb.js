@@ -137,6 +137,16 @@ class ProductDB{
             throw new CustomError(`An unexpected error has occurred: ${error.message}`, 500);
         }   
     }
+
+    async updateStock(code, newStock){
+        try{
+            const mongodbResponse = await model.updateOne({code}, {stock: newStock});
+            return mongodbResponse.modifiedCount ? true : false;
+        }catch(error){
+            // throw new CustomError(`An unexpected error has occurred: ${error.message}`, 500);
+            return false;
+        }
+    }
 }
 
 const productDB = new ProductDB();
