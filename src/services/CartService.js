@@ -57,10 +57,7 @@ class CartService{
                     purchasedList.push({ title, price, amount });
 
                     const index = cart.products.findIndex(product => product.product.code == code);
-                    
-                    if (index >= 0) {
-                        cart.products.splice(index, 1);
-                    }
+                    if (index >= 0) cart.products.splice(index, 1);
                 }
             });
         }));
