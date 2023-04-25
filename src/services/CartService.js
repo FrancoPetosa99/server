@@ -39,24 +39,40 @@ class CartService{
         //get cart from db
         const cart = await cartDB.getById(cartId);
         
+        //check there are products in cart
+        if(cart.products.length == 0) throw new CustomError(400, 'Purchase process is not allow when cart is empty');
+
         //collect products with enough stock to complete purchase process
         const availableProducts = cart.products.filter(product => product.product.stock >= product.amount);
         
-        //update stock
+        //update stock of products
         await Promise.all(availableProducts.map(product => {
             const { title, price, code, stock } = product.product;
             const { amount } = product;
 
             return productDB.updateStock(code, stock - amount)
             .then(isStockUpdated => {
-                //if product stock could be updated, so add it to purchased list
-                if(isStockUpdated) purchasedList.push({ title, price, amount });
+                //if stock could be updated, so add it to purchased list and remove it from the cart
+                if(isStockUpdated){
+                    purchasedList.push({ title, price, amount });
+
+                    const index = cart.products.findIndex(product => product.product.code == code);
+                    
+                    if (index >= 0) {
+                        cart.products.splice(index, 1);
+                    }
+                }
             });
         }));
 
-        const ticketCode = await ticketService.generateTicket(purchasedList);
-
-        return ticketCode;
+        //update products on cart
+        const unpurchasedList = cart.products;
+        await cartDB.updateProducts(cartId, unpurchasedList);
+    
+        return {
+            purchasedList,
+            unpurchasedList
+        };
     }
 
 }

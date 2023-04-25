@@ -9,15 +9,14 @@ const dataModelObj = {
     items: {
         type: [
             {
-                product: {
-                    title: String,
-                    price: mongoose.Schema.Types.Decimal128,
-                    amount: Number
-                }
+                title: String,
+                price: mongoose.Schema.Types.Decimal128,
+                amount: Number
             }
         ]
     },
-    total: mongoose.Schema.Types.Decimal128 
+    total: mongoose.Schema.Types.Decimal128,
+    purchaser: String
 };
 
 const schemaConfigObj = {

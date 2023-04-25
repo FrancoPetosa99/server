@@ -31,7 +31,7 @@ class CartDB{
     
     async addProduct(cartId, product){
         try{
-            await model.updateOne({_id: cartId}, 
+            return model.updateOne({_id: cartId}, 
                 { $set: { "products.$[product].amount": product.amount } },
                 {
                     arrayFilters: [{ 'product._id': product.id}]
@@ -44,7 +44,7 @@ class CartDB{
 
     async insertNewProduct(cartId, productId){
         try{
-            await model.updateOne(
+            return model.updateOne(
                 { _id: cartId },
                 { 
                     $push: { 
@@ -60,17 +60,12 @@ class CartDB{
         }
     }
 
-    async deleteProductFromCart(cartId, productsArr){
-
-        const updateObj = {};
-        updateObj.products = productsArr.map(({id, amount}) => {
-            const mapedObj = {};
-            mapedObj.product = id;
-            mapedObj.amount = amount;
-            return mapedObj;
-        });
-
-        await this.updateById(cartId, updateObj);
+    async updateProducts(cartId, products){
+        try{
+            return model.updateOne({ _id: cartId }, { products: products });
+        }catch(error){
+            throw new CustomError(`An unexpected error has occurred: ${error.message}`, 500);
+        }  
     }
 }
 

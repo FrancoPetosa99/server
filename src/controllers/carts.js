@@ -4,6 +4,7 @@
 import { Router } from "express";
 import cartService from "../services/CartService.js";
 import productService from "../services/ProductService.js";
+import ticketService from "../services/TicketService.js";
 import { permission, authentication } from '../middlewares/index.js';
 
 
@@ -77,20 +78,21 @@ router.post('/product/:pcode', authentication('authToken'), async (request, resp
 
 router.post('/purchase', authentication('authToken'), async (request, response)=> {
     try{
-        const cartId = request.user.cartId;
+        const { cartId, email } = request.user;
+        const { purchasedList, unpurchasedList } = await cartService.purchase(cartId);
 
-        const cart = await cartService.purchase(cartId);
-        
-
-        
-
+        const ticketCode = await ticketService.generateTicket(purchasedList, email);
+    
         //send response to client
         response
         .status(200)
         .json({
             status: 'Success',
-            data: cart,
-            message: 'Purchase successfully completed'
+            data: {
+                ticketCode: ticketCode,
+                unpurchasedProducts: unpurchasedList
+            },
+            message: `Purchase successfully completed.`
         });
 
     }catch(error){
