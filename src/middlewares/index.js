@@ -4,6 +4,7 @@ import authentication from './authentication.js';
 import permission from './permission.js';
 import HTTPMethod from './HTTPMethod.js';
 import productValidation from './productValidation.js';
+import resetPasswordValidation from './resetPasswordValidation.js';
 
 export {
     privateAccess,
@@ -11,5 +12,6 @@ export {
     authentication,
     permission,
     HTTPMethod,
-    productValidation
+    productValidation,
+    resetPasswordValidation
 };

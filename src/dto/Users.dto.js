@@ -41,11 +41,11 @@ class UserDTO{
         return userDTO;
     }
 
-    resetPassword(credentials){
+    resetPassword(email, password, confirmPassword){
         const userDTO = {};
-        userDTO.email = credentials.email;
-        userDTO.oldPassword = credentials.oldPassword;
-        userDTO.newPassword = credentials.newPassword;
+        userDTO.email = email;
+        userDTO.newPassword = password;
+        userDTO.confirmPassword = confirmPassword;
         return userDTO;
     }
 }

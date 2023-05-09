@@ -1,5 +1,4 @@
 import { cartDB, productDB } from "../dao/index.js";
-import ticketService from "./TicketService.js";
 import CustomError from "../util/customError.js";
 
 class CartService{
@@ -18,22 +17,32 @@ class CartService{
         return cart;
     }
 
-    async addProduct(cartId, productId){
-        const cart = await this.getCartById(cartId);
+    async addProduct(cartId, productId, user){
+        const userEmail = user.email;
 
+        //get products on cart
+        const cart = await this.getCartById(cartId);
         const products = cart.products;
-        const product = products.find(product => product.product.id == productId);
-   
-        if(product) {
-            product.amount++;
-            await cartDB.addProduct(cartId, product);
+
+        //check if product is already on cart
+        const productInsideCart = products.find(product => product.product.id == productId);
+        
+        //if product is already on cart add 1 unit to the current amount
+        if(productInsideCart) {
+            productInsideCart.amount++;
+            await cartDB.addProduct(cartId, productInsideCart);
 
         }else {
+            //must check if product belongs to current user
+            const product = await productDB.getById(productId);
+            const productOwner = product.owner;
+            if(productOwner && userEmail === productOwner) throw new CustomError(403, 'Client can not add owned products on cart');
             await cartDB.insertNewProduct(cartId, productId);
         }
     }
 
     async purchase(cartId){
+        const errorLog = [];
         const purchasedList = [];
 
         //get cart from db
@@ -45,22 +54,29 @@ class CartService{
         //collect products with enough stock to complete purchase process
         const availableProducts = cart.products.filter(product => product.product.stock >= product.amount);
         
-        //update stock of products
+        //update stock of products. If an error occurs on one product process still runs
         await Promise.all(availableProducts.map(product => {
             const { title, price, code, stock } = product.product;
             const { amount } = product;
 
             return productDB.updateStock(code, stock - amount)
-            .then(isStockUpdated => {
-                //if stock could be updated, so add it to purchased list and remove it from the cart
-                if(isStockUpdated){
-                    purchasedList.push({ title, price, amount });
-
-                    const index = cart.products.findIndex(product => product.product.code == code);
-                    if (index >= 0) cart.products.splice(index, 1);
-                }
+            .then(() => {
+                //if stock was updated, add it to purchased list and remove it from the cart
+                purchasedList.push({ title, price, amount });
+                const index = cart.products.findIndex(product => product.product.code == code);
+                if (index >= 0) cart.products.splice(index, 1);
+            })
+            .catch((error)=> {
+                errorLog.push(error.message);
             });
         }));
+
+        //record errors on logger
+        if(errorLog.length > 0){
+            //implementar logger
+            const error = errorLog.join('; ')
+            console.log(error);
+        }
 
         //update products on cart
         const unpurchasedList = cart.products;

@@ -10,13 +10,9 @@ const router = Router(); //INITIALIZE ROUTER
 //POST METHOD ENDPOINTS
 /********************************************/
 router.post('/', async (request, response)=> {
-    
     try{
-
         const { to, subject } = request.body;
         const from = 'coder40305@gmail.com';
-
-        console.log(process.cwd());
         
         const emailSent = await transport.sendMail({
             from: from,
@@ -34,6 +30,8 @@ router.post('/', async (request, response)=> {
             ]
         });
 
+        console.log(emailSent);
+
         //send response to client
         response
         .status(200)
@@ -41,7 +39,6 @@ router.post('/', async (request, response)=> {
             status: 'Success',
             message: 'Email successfully sent'
         });
-
     }catch(error){
         //handle error response
 

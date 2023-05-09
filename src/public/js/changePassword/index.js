@@ -16,22 +16,23 @@ const formResetPassword = document.getElementById('resetPasswordForm');
 //HELPER FUNCTIONS
 /********************************************/
 async function resetPassword(newUserObj){
-    
-    ui.handleBtnLoading();
 
-    const response = await fetch('http://localhost:8080/api/users/passwordResetEmail', {
-        method: 'POST',
+    const response = await fetch(`http://localhost:8080/api/users/passwordReset`, {
+        method: 'PATCH',
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(newUserObj)
     });
 
-    ui.handleBtnLoading();
-
     const data = await response.json();
+    
+    if(data.status == 'Success'){
+        ui.displayAlert('success', data.message);
+    }else{
+        ui.displayAlert('error', data.error.message);
+    }
 
-    ui.displayAlert('success', data.message);
 }
 
 /********************************************/

@@ -29,17 +29,13 @@ class UserDB{
         }
     }
 
-    async updatePassword(email, newPassword){
+    async resetPassword(userEmail, newPassword){
         try{
-
-            const mongodbResponse = users.updateOne({ email }, { password: newPassword});
-            console.log(mongodbResponse);
-
-            return mongodbResponse;
+            return users.updateOne({ email: userEmail}, {password: newPassword });
 
         }catch(error){
             throw new CustomError(`An unexpected error has occurred`, 500);
-        }        
+        }
     }
 }
 

@@ -14,6 +14,10 @@ const dataModelObj = {
     stock: Number,
     category: String,
     available: Boolean,
+    owner: {
+        type: String,
+        default: 'Admin'
+    }
 };
 
 const schemaConfigObj = {

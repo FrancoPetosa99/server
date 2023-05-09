@@ -1,9 +1,4 @@
 function UI(){
-    
-    const loading = document.getElementById('btn-loading');
-
-    const container = document.getElementById('container');
-
     function displayAlert(type, message){
         Swal.fire({
             toast: true,
@@ -19,23 +14,8 @@ function UI(){
             }
         });
     }
-
-    function handleBtnLoading(){
-        loading.classList.toggle('fade');
-    }
-
-    function hideContainer(){
-        container.classList.add('hide');
-    }
-
-    function showContainer(){
-        container.classList.remove('hide');
-    }
-
+    
     return {
-        handleBtnLoading,
-        hideContainer,
-        showContainer,
         displayAlert
     }
 }

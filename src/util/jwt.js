@@ -3,8 +3,8 @@ import { JWT_SECRET_KEY } from '../config/env.config.js';
 
 function JWTManager(){
 
-    function generateToken(payload){
-        const token = jwt.sign({payload}, JWT_SECRET_KEY, { expiresIn: '20m' });
+    function generateToken(payload, time = '20m'){
+        const token = jwt.sign({payload}, JWT_SECRET_KEY, { expiresIn: time });
         return token;
     }
     

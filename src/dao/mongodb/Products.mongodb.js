@@ -141,10 +141,9 @@ class ProductDB{
     async updateStock(code, newStock){
         try{
             const mongodbResponse = await model.updateOne({code}, {stock: newStock});
-            return mongodbResponse.modifiedCount ? true : false;
+            return mongodbResponse.modifiedCount ? 'Success' : 'Error';
         }catch(error){
-            // throw new CustomError(`An unexpected error has occurred: ${error.message}`, 500);
-            return false;
+            throw new CustomError(500, `Could not update stock on product with code${code}. An unexpected error has occurred: ${error.message}`);
         }
     }
 }

@@ -2,9 +2,9 @@
 //IMPORT MODULES
 /********************************************/
 import { Router } from "express";
-import { serverSocket } from "../index.js";
 import productService from "../services/ProductService.js";
 import { permission, authentication, productValidation } from '../middlewares/index.js';
+import productDTO from "../dto/Product.dto.js";
 
 const router = Router(); //INITIALIZE ROUTER
 
@@ -18,10 +18,24 @@ router.get('/', async (request, response)=> {
 
         const products = await productService.getProducts(queryObj);
 
-        response.json(200, products);
+        response
+        .status(200)
+        .json(products);
 
     }catch(error){
-        response.json(400, "An error has occurred: " + error.message);
+        //handle error response
+        const statusCode = error.statusCode || 500;
+        const message = error.message || 'An unexpected error has ocurred';
+
+        //send response to client
+        response
+        .status(statusCode)
+        .json({
+            status: 'Error',
+            error: {
+                message: message
+            }
+        });
     }
 
 });
@@ -32,10 +46,24 @@ router.get('/:code', async (request, response)=> {
 
         const product = await productService.getProductByCode(code);
         
-        response.json(200, product);
+        response
+        .status(200)
+        .json(product);
 
     }catch(error){
-        response.json(400, "An error has occurred: " + error.message);
+        //handle error response
+        const statusCode = error.statusCode || 500;
+        const message = error.message || 'An unexpected error has ocurred';
+
+        //send response to client
+        response
+        .status(statusCode)
+        .json({
+            status: 'Error',
+            error: {
+                message: message
+            }
+        });
     }
 
 });
@@ -46,14 +74,14 @@ router.get('/:code', async (request, response)=> {
 router.post(
     '/',
     authentication('authToken'), 
-    permission(['Admin', 'Master']), 
+    permission(['Premium', 'Admin', 'Master']), 
     productValidation, 
     async (request, response)=> {
         try{
-            const dataProductObj = request.body;
-            const newProduct = await productService.createNew(dataProductObj);
+            const user = request.user;
+            const newProductData = productDTO.newProduct(request.body, user);
+            const newProduct = await productService.createNew(newProductData);
             response.json(201, `product with id ${newProduct.id} was successfully added`);
-            serverSocket.emit('product-added', newProduct);
 
             //send response to client
             response
@@ -85,17 +113,31 @@ router.post(
 //PUT METHOD ENDPOINTS
 /********************************************/
 router.put(
-    '/:id', 
+    '/:code', 
     authentication('authToken'), 
-    permission(['Admin', 'Master']), 
+    permission(['Premium', 'Admin', 'Master']), 
     async (request, response)=> {
         try{
-            const productId = request.params.id;
-            const newData = request.body;
-            const updatedProduct = await productService.updateProduct(productId, newData);
-            response.json(200, `Product ${updatedProduct.title} successfully updated`);
+            //HERE GOES YOUR CODE
+
+            response
+            .status(200)
+            .json(`Product ${updatedProduct.title} successfully updated`);
+
         }catch(error){
-            response.json(400, 'The following errors has occurred: ' + error.message);
+            //handle error response
+            const statusCode = error.statusCode || 500;
+            const message = error.message || 'An unexpected error has ocurred';
+ 
+            //send response to client
+            response
+            .status(statusCode)
+            .json({
+                status: 'Error',
+                error: {
+                    message: message
+                }
+            });
         }
     }
 );
@@ -104,17 +146,37 @@ router.put(
 //DELETE METHOD ENDPOINTS
 /********************************************/
 router.delete(
-    '/:id', 
+    '/:code', 
     authentication('authToken'), 
-    permission(['Admin', 'Master']), 
+    permission(['Premium', 'Admin', 'Master']), 
     async (request, response)=> {
         try{
-            const productId = request.params.id;
-            await productService.deleteProduct(productId);
-            response.json(200, `Product with id ${productId} successfully deleted`);
-            serverSocket.emit('product-deleted', productId);
+            const productCode = request.params.code;
+            const user = request.user;
+            await productService.deleteProduct(productCode, user);
+
+            //return success response to client
+            response
+            .status(200)
+            .json({
+                status: 'Success',
+                message: `Product with id ${productCode} successfully deleted`
+            });
+
         }catch(error){
-            response.json(400, 'The following errors has occurred: ' + error.message);
+           //handle error response
+           const statusCode = error.statusCode || 500;
+           const message = error.message || 'An unexpected error has ocurred';
+
+           //send response to client
+           response
+           .status(statusCode)
+           .json({
+               status: 'Error',
+               error: {
+                   message: message
+               }
+           });
         }
     }
 );

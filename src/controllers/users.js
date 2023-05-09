@@ -7,6 +7,7 @@ import userDTO from "../dto/Users.dto.js";
 import jwtManager from "../util/jwt.js";
 import signUpValidation from "../middlewares/signUpValidation.js";
 import CustomError from "../util/customError.js";
+import { authentication, resetPasswordValidation } from "../middlewares/index.js";
 
 const router = Router(); //INITIALIZE ROUTER
 
@@ -59,22 +60,87 @@ router.post('/', signUpValidation, async (request, response)=> {
     }
 });
 
-router.patch('/passwordReset', async (request, response)=> {
-    
+router.post('/passwordResetEmail', async (request, response)=> {
     try{
-        const credentials = userDTO.resetPassword(request.body);
+        const { email } = request.body;
 
-        await userService.resetPassword(credentials);
+        const user = await userService.getUserByEmail(email);
 
-        const responseObj = {};
-        responseObj.message = 'Password successfully updated';
-    
+        if(!user) throw new CustomError(404, `User with email ${email} could not be found`);
+
+        await userService.sendResetPasswordEmail(user)
+
         //send response to client
         response
         .status(200)
         .json({
             status: 'Success',
             message: 'Password successfully updated'
+        });
+    }catch(error){
+        //handle error response
+
+        const statusCode = error.statusCode || 500;
+        const message = error.message || 'An unexpected error has ocurred';
+
+        //send response to client
+        response
+        .status(statusCode)
+        .json({
+            status: 'Error',
+            error: {
+                message: message
+            }
+        });
+    }
+});
+
+router.patch('/passwordReset/', authentication('resetToken'), resetPasswordValidation, async (request, response)=> {
+    try{
+        const { password, confirmPassword } = request.body;
+        const { email } = request.user;
+
+        const credentials = userDTO.resetPassword(email, password, confirmPassword);
+
+        await userService.resetPassword(credentials);
+
+        //send response to client
+        response
+        .clearCookie('resetToken')
+        .status(200)
+        .json({
+            status: 'Success',
+            message: 'Password successfully updated'
+        });
+    }catch(error){
+        //handle error response
+
+        const statusCode = error.statusCode || 500;
+        const message = error.message || 'An unexpected error has ocurred';
+
+        //send response to client
+        response
+        .status(statusCode)
+        .json({
+            status: 'Error',
+            error: {
+                message: message
+            }
+        });
+    }
+});
+
+router.patch('/premium/uid', authentication('authToken'), resetPasswordValidation, async (request, response)=> {
+    try{
+        
+        //YOUR CODE GOES HERE
+
+        //send response to client
+        response
+        .status(200)
+        .json({
+            status: 'Success',
+            message: 'User role successfully updated'
         });
         
     }catch(error){

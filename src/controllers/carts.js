@@ -46,10 +46,11 @@ router.post('/product/:pcode', authentication('authToken'), async (request, resp
     try{
         const productCode = request.params.pcode;
         const cartId = request.user.cartId;
+        const user = request.user;
 
         const product = await productService.getProductByCode(productCode);
-
-        await cartService.addProduct(cartId, product.id);
+        
+        await cartService.addProduct(cartId, product.id, user);
 
         //send response to client
         response
@@ -114,34 +115,7 @@ router.post('/purchase', authentication('authToken'), async (request, response)=
 /********************************************/
 //PUT METHOD ENDPOINTS
 /********************************************/
-router.put('/:cid', async (request, response)=> {
-    try{
 
-        const cartId = request.params.cid;
-        const newProductArr = request.body;
-
-        await cartService.updateCartContent(cartId, newProductArr);
-
-        response.json(200, `Cart with id ${cartId} successfully updated`);
-    }catch(error){
-        response.json(400, 'An error occurred during process:' + error.message);
-    }
-});
-
-router.put('/:cid/product/:pid', async (request, response)=> {
-    try{
-
-        const cartId = request.params.cid;
-        const productId = request.params.pid;
-        const amount = request.body.amount;
-
-        await cartService.updateProductInCart(cartId, productId, amount);
-
-        response.json(200, `Cart with id ${cartId} successfully updated`);
-    }catch(error){
-        response.json(400, 'An error occurred during process:' + error.message);
-    }
-});
 
 /********************************************/
 //DELETE METHOD ENDPOINTS

@@ -2,7 +2,6 @@
 //IMPORT MODULES
 /********************************************/
 import { Server } from 'socket.io';
-import chatService from '../services/chatService.js';
 
 function ServerSocket(httpServer){
 

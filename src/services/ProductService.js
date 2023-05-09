@@ -1,4 +1,4 @@
-import { productDB } from "../dao/index.js";
+import { productDB, userDB } from "../dao/index.js";
 import CustomError from "../util/customError.js";
 
 class ProductService{
@@ -82,7 +82,7 @@ class ProductService{
 
     async createNew(newProductData){
         const { code } = newProductData;
-
+        
         const duplicatedProduct = await productDB.getByCode(code);
 
         if(duplicatedProduct) throw new CustomError(400, `Product with code ${code} already exist`);
@@ -105,57 +105,17 @@ class ProductService{
         return product;
 
     }
+    
+    async deleteProduct(code, user){
+        const { role, email } = user;
+       
+        const product = await productDB.getByCode(code);
+        if(!product) throw new CustomError(404, `The product with code ${code} could not be found`);
 
-    async updateProduct(id, newData){
+        //if the user is premium must check that product belongs to him
+        if(role === 'Premium' && email !== product.owner) throw new CustomError(403, `Client does not have permission on this product`);
 
-        //handle validations first
-        if(!newData) throw new Error('Empty data is not valid');
-
-        const product = await this.getProductByID(id);
-
-        if(!product) throw new Error(`The product with id ${id} could not be found`);
-        
-        //at this point errors will not stop process
-        const errorLog = [];
-
-        const validFieldList = [
-            'title',
-            'description',
-            'price',
-            'image',
-            'code',
-            'stock',
-        ];
-
-        //only allow to update valid fields
-        for(const key in newData){
-            try{
-                const isKeyValid = validFieldList.some(field => field == key);
-                const isValueValid = newData[key] ? true : false;
-
-                if(!isKeyValid) throw new Error(`The field key ${key} can not be recognized`);
-                if(!isValueValid) throw new Error(`The field value ${newData[key]} is not valid`);
-
-            }catch(error){
-                errorLog.push(error.message);
-            }
-        }
-
-        //verify no error has occurred during the process before writing the "db"
-        if(errorLog.length > 0) throw new Error(errorLog.join('; '));
-
-       const updatedProduct = await productDB.updateById(id, newData);
-
-       return updatedProduct;
-    }
-
-    async deleteProduct(id){
-
-        const product = await this.getProductByID(id);
-
-        if(!product) throw new Error(`The product with id ${id} could not be found`);
-
-        await productDB.deleteById(id);
+        await productDB.deleteByCode(code);
     }
 
     async getProductByCode(code){

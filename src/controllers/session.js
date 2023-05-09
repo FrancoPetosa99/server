@@ -41,7 +41,9 @@ router.get('/logout', (request, response)=> {
 router.get('/failLogin', ()=> {
     const error = {};
     error.message = 'Could not loggin';
-    response.json(200, error);
+    response
+    .status(400)
+    .json(error);
 });
 
 router.get('/github', passport.authenticate('github', {scope: ['user: email'] }));

@@ -1,6 +1,9 @@
 import { userDB, cartDB } from "../dao/index.js";
 import encrypt from "../util/encrypt.js";
 import CustomError from "../util/customError.js";
+import getTemplateString from '../templates/resetPassword.template.js'
+import transport from "../util/gmail.js";
+import jwtManager from "../util/jwt.js";
 
 class UserService{
 
@@ -37,8 +40,6 @@ class UserService{
 
         const userData = await userDB.getUserByEmail(email);
 
-        console.log(userData);
-
         //check user exist
         if(!userData) throw new CustomError(404, `Could not found user with email ${email}`);
 
@@ -50,20 +51,41 @@ class UserService{
         return userData;
     }
 
-    async resetPassword(userObjData){
+    async resetPassword(credentials){
+        const { email, newPassword, confirmPassword } = credentials;
         
-        const { email, oldPassword, newPassword } = userObjData;
+        //check user exist
+        const userData = await userDB.getUserByEmail(email);
+        if(!userData) throw new CustomError(404, `Could not found user with email ${email}`);
 
-        //check email and old password are valid
-        await this.checkEmailAndPassword(email, oldPassword);
+        //check new password is not equal to old password
+        const passwordMatch = encrypt.checkPassword(newPassword, userData.password);
+        if(passwordMatch)  throw new CustomError(400, 'New password must be different from previous password');
 
-        //encrypt new password
-        const encryptedNewPassword = encrypt.getHashedPassword(newPassword);
+        //hash new password
+        const hashedPassword = encrypt.getHashedPassword(newPassword);
 
-        await userDB.updatePassword(email, encryptedNewPassword);
-
+        return userDB.resetPassword(email, hashedPassword);
     }
-    
+
+    async sendResetPasswordEmail(user){
+        const { email, firstName, lastName } = user;
+        const token = jwtManager.generateToken({email: email}, '60m');
+        const templateString = getTemplateString({firstName, lastName}, `http://localhost:8080/api/views/changePassword/${token}`);
+        
+        const emailConfig = {
+            from: 'coder40305@gmail.com',
+            to: email,
+            subject: 'Reset password',
+            html: templateString
+        }
+
+        return transport.sendMail(emailConfig, (error)=> {
+            const { code, message } = error;
+            if(error) throw new CustomError(code, message);
+        });
+    }
+
     async getUserByEmail(userEmail){
 
         const userData = await userDB.getUserByEmail(userEmail)
@@ -90,35 +112,6 @@ class UserService{
         if(user) userExist = true;
         
         return userExist;
-    }
-
-    verifyHexaNumber(hexaNumber){
-
-        let isNumberValid = true;
-
-        const maxLength = 24;
-
-        //list of valid characters in hexadecimal number system
-        const hexaCharacters = [
-            '0','1','2','3','4','5','6','7','8','9',
-            'a','b','c','d','e','f'
-        ];
-
-        try{
-            //verify if the number has hexadecimal characters only
-            for (let i = 0; i < hexaNumber.length; i++) {
-                const isCharacterValid = hexaCharacters.includes(hexaNumber[i]);
-                if(!isCharacterValid) throw new Error(`The character ${hexaNumber[i]} is not valid`);
-            }
-
-            //verify the hexadecimal number has 24 characters only
-            if(hexaNumber.length !== maxLength) throw new Error(`hexadecimal number does not have 24 characters`);
-
-        }catch(error){
-            isNumberValid = false;
-        }finally{
-            return isNumberValid;
-        }
     }
 }
 

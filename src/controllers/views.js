@@ -4,11 +4,11 @@
 import { Router } from "express";
 import productService from "../services/ProductService.js";
 import cartService from "../services/CartService.js";
-import chatService from "../services/chatService.js";
 import { privateAccess, publicAccess } from '../middlewares/index.js';
 import reqURLExtractor from "../util/reqURLExtractor.js";
 import cookieExtractor from "../util/cookieExtractor.js";
 import jwtManager from "../util/jwt.js";
+import CustomError from "../util/customError.js";
 
 const router = Router(); //INITIALIZE ROUTER
 
@@ -67,27 +67,6 @@ router.get('/realtimeproducts', async (request, response)=> {
     }
     
     response.render('realTimeProducts2', renderObj);
-
-});
-
-router.get('/chat', async (request, response)=> {
-
-    try{
-        const previousMessages = await chatService.getMessages();
-    
-        const renderObj = {
-            title: 'Public Chat',
-            cssFileName: 'chat.css',
-            messages: previousMessages
-        };
-    
-        response.render('chat', renderObj);
-        
-    }catch(error){
-       
-        response.send(`<h1>The following error has occurred: ${error.message}</h1>`);
-    }
-    
 
 });
 
@@ -219,6 +198,32 @@ router.get('/resetPassword', publicAccess, async (request, response)=> {
         
     }catch(error){
         response.send(`<h1>The following error has occurred: ${error.message}</h1>`);
+    }
+});
+
+router.get('/changePassword/:token', async (request, response)=> {
+    try{
+        const { token } = request.params;
+        const isTokenValid = jwtManager.verifyToken(token);
+        
+        if(!isTokenValid) throw new CustomError(401, 'Token is not valid or has expired');
+
+        const renderObj = {
+            title: 'Change Password',
+            cssFileName: 'changePassword.css',
+        };
+        
+        response
+        .cookie('resetToken', token)
+        .render('changePassword', renderObj);
+        
+    }catch(error){
+
+        response
+        .render('resetPassword', {
+            title: 'Reset Password',
+            cssFileName: 'resetPassword.css'
+        });
     }
 });
 
