@@ -1,0 +1,15 @@
+openapi: "3.0.0"
+info: 
+  title: API Products
+  version: "0.0"
+paths:
+  /api/products/:
+    get:
+      summary: Get products
+      tags: 
+        - Products
+      responses: 
+        "200": 
+          description: Products retrieved successfully
+        "500": 
+          description: An internal error has occurred
