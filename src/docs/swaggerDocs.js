@@ -14,7 +14,7 @@ function Swagger(){
         },
         apis: [`${__dirname}/docs/**/*.yaml`]
     };
-    console.log(__dirname);
+    
     const ui = swaggerUiExpress.serve;
 
     function setUp(){

@@ -58,9 +58,12 @@ class ProductDB{
                 price: product.price,
                 image: product.image,
                 code: product.code,
-                stock: product.stock
+                stock: product.stock,
+                
             }
         });
+
+        console.log( mongodbResponse.docs);
 
         return pagination;
     }
