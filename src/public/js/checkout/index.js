@@ -11,6 +11,7 @@ const tbody = document.querySelector('tbody');
 /********************************************/
 //GLOBAL VARIABLES
 /********************************************/
+const  baseURL = window.location.href;
 
 /********************************************/
 //HELPER FUNCTIONS
@@ -19,7 +20,7 @@ async function getCartData(){
 
     const cartId = localStorage.getItem('cartId');
 
-    const response = await fetch(`http://localhost:8080/api/carts/${cartId}`)
+    const response = await fetch(`${baseURL}/api/carts/${cartId}`)
                     .then(res => res.json());
 
     return response;

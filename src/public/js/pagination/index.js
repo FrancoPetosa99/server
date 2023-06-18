@@ -13,13 +13,14 @@ const pagination = document.querySelector('.pagination');
 /********************************************/
 //GLOBAL VARIABLES
 /********************************************/
+const  baseURL = window.location.href;
 
 /********************************************/
 //HELPER FUNCTIONS
 /********************************************/
 async function getProducts(page = 1, limit = 10, sort = 'asc'){
 
-    const response = await fetch(`http://localhost:8080/api/products?limit=${limit}&page=${page}&sort=${sort}`);
+    const response = await fetch(`${baseURL}/api/products?limit=${limit}&page=${page}&sort=${sort}`);
     const objResponse = await response.json();
 
     console.log(objResponse);
@@ -33,7 +34,7 @@ async function createCart(){
 
     //if cart does not exist in the current session request to create one
     if(!cartId){
-        const response = await fetch(`http://localhost:8080/api/carts`, {
+        const response = await fetch(`${baseURL}/api/carts`, {
             method: 'POST'
         });
         const responseObj = await response.json();

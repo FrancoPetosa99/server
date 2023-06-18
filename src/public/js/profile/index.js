@@ -15,27 +15,27 @@ const userBirthdate = document.getElementById('user-birthdate')
 /********************************************/
 //GLOBAL VARIABLES
 /********************************************/
+const  baseURL = window.location.href;
 
 /********************************************/
 //HELPER FUNCTIONS
 /********************************************/
 async function getUserData(){
-    return fetch('http://localhost:8080/api/session/current')
+    return fetch(`${baseURL}/api/session/current`)
     .then((res)=> res.json());
 }
 
 function logOut(){
-    fetch('http://localhost:8080/api/session/logout')
+    fetch(`${baseURL}/api/session/logout`)
     .then((res)=> res.json())
     .then((data)=> ui.displayAlert('success', data.message))
-    .then(setTimeout(()=> window.location.href = 'http://localhost:8080/api/views/logging', 1000))
+    .then(setTimeout(()=> window.location.href = `${baseURL}/api/views/logging`, 1000))
     .catch((error)=> ui.displayAlert('error', error.message));
 }
 /********************************************/
 //MAIN CODE
 /********************************************/
 try{
-
     const response = await getUserData();
     const { email, firstName, lastName, birthdate } = response.data;
 
@@ -43,8 +43,6 @@ try{
     userName.textContent = firstName;
     userLastName.textContent = lastName;
     userBirthdate.textContent = birthdate;
-
-
 
     ui.displayAlert('success', `Welcome ${firstName}!`);
 

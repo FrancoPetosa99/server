@@ -12,6 +12,7 @@ const inputEmail = document.getElementById('input-email');
 /********************************************/
 //GLOBAL VARIABLES
 /********************************************/
+const  baseURL = window.location.href;
 
 /********************************************/
 //HELPER FUNCTIONS
@@ -25,18 +26,13 @@ async function login(email, password){
     bodyRequest.email = email;
     bodyRequest.password = password;
 
-    return fetch(`http://localhost:8080/api/session`, {
+    return fetch(`${baseURL}/api/session`, {
         method: httpMethod,
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(bodyRequest)
-    })
-
-    // setTimeout(()=> {
-    //     window.location.href = 'http://localhost:8080/api/views/logging';
-    // }, 2500)
-
+    });
 }
 
 function handleAPIResponse(statusCode, data){
@@ -52,7 +48,7 @@ function handleAPIResponse(statusCode, data){
     }else{
         alert.type = 'success';
         alert.message = data.message;
-        setTimeout(()=> window.location.href = 'http://localhost:8080/api/views/home', 1500);
+        setTimeout(()=> window.location.href = `${baseURL}/api/views/home`, 1500);
     }
 
     ui.displayAlert(alert.type, alert.message);

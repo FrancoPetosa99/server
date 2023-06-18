@@ -11,13 +11,14 @@ const formResetPassword = document.getElementById('resetPasswordForm');
 /********************************************/
 //GLOBAL VARIABLES
 /********************************************/
+const  baseURL = window.location.href;
 
 /********************************************/
 //HELPER FUNCTIONS
 /********************************************/
 async function resetPassword(newUserObj){
 
-    const response = await fetch(`http://localhost:8080/api/users/passwordReset`, {
+    const response = await fetch(`${baseURL}/api/users/passwordReset`, {
         method: 'PATCH',
         headers: {
             "Content-Type": "application/json",

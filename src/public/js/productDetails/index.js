@@ -12,6 +12,7 @@ const btnAdd = document.getElementById('btn-add-cart');
 /********************************************/
 //GLOBAL VARIABLES
 /********************************************/
+const  baseURL = window.location.href;
 
 /********************************************/
 //HELPER FUNCTIONS
@@ -24,7 +25,7 @@ async function addProductToCart(){
     //get cart id from local storage
     const cartId = localStorage.getItem('cartId');
 
-    const response = await fetch(`http://localhost:8080/api/carts/${cartId}/product/${productId}`, {
+    const response = await fetch(`${baseURL}/api/carts/${cartId}/product/${productId}`, {
         method: 'POST'
     });
 
@@ -39,7 +40,7 @@ async function getCartData(){
     //get cart id from local storage
     const cartId = localStorage.getItem('cartId');
 
-    const cartObj = await fetch(`http://localhost:8080/api/carts/${cartId}`)
+    const cartObj = await fetch(`${baseURL}/api/carts/${cartId}`)
                     .then(res => res.json());
 
     return cartObj;
