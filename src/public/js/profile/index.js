@@ -15,7 +15,7 @@ const userBirthdate = document.getElementById('user-birthdate')
 /********************************************/
 //GLOBAL VARIABLES
 /********************************************/
-const  baseURL = window.location.href;
+const  baseURL = window.location.origin;
 
 /********************************************/
 //HELPER FUNCTIONS

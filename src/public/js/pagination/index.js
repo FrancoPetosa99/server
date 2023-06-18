@@ -13,7 +13,7 @@ const pagination = document.querySelector('.pagination');
 /********************************************/
 //GLOBAL VARIABLES
 /********************************************/
-const  baseURL = window.location.href;
+const  baseURL = window.location.origin;
 
 /********************************************/
 //HELPER FUNCTIONS
