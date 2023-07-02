@@ -119,16 +119,19 @@ class ProductService{
 
         await productDB.deleteByCode(code);
 
-        const templateString = getTemplateString(user, product);
-        
-        const emailConfig = {
-            from: 'coder40305@gmail.com',
-            to: product.owner,
-            subject: 'Product Deleted',
-            html: templateString
+        //if the deleted product had an owner notify him by sending an email
+        if(product.owner){
+            const templateString = getTemplateString(user, product);
+            
+            const emailConfig = {
+                from: 'coder40305@gmail.com',
+                to: product.owner,
+                subject: 'Product Deleted',
+                html: templateString
+            }
+    
+            return gmail.sendEmail(emailConfig);
         }
-        
-        return gmail.sendEmail(emailConfig);
     }
 
     async getProductByCode(code){
