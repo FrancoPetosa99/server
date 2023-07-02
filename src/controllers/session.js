@@ -102,12 +102,16 @@ router.post('/', signInValidation, async (request, response)=> {
 
         //check if email and password are valid
         const userData = await userService.checkEmailAndPassword(credentials);
-        
+
+        //update last session date
+        const { email } = userData;
+        await userService.updateLastSession(email);
+
         //avoids put into the token sensitive user data
         const userTokenData = userDTO.token(userData);
 
-        //user credentials are valid so generate jwt token
-        const token = jwtManager.generateToken(userTokenData);
+        //generate jwt token - expiry time 60 minutes
+        const token = jwtManager.generateToken(userTokenData, '60m');
         
         //send response to client and token by cookies
         response

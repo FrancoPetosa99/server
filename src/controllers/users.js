@@ -1,15 +1,51 @@
 /********************************************/
 //IMPORT MODULES
 /********************************************/
-import { Router } from "express";
+import { Router, request, response } from "express";
 import userService from "../services/UserService.js";
 import userDTO from "../dto/Users.dto.js";
 import jwtManager from "../util/jwt.js";
 import signUpValidation from "../middlewares/signUpValidation.js";
 import CustomError from "../util/customError.js";
-import { authentication, resetPasswordValidation } from "../middlewares/index.js";
+import { authentication, resetPasswordValidation, permission } from "../middlewares/index.js";
 
 const router = Router(); //INITIALIZE ROUTER
+
+router.get(
+    '/', 
+    authentication('authToken') 
+    ,permission(['Master','Admin']), 
+    async (request, response)=> {
+        try{
+
+            const userList = await userService.getUsers()
+            //send response to client
+            response
+            .status(200)
+            .json({
+                status: 'Success',
+                message: 'Users successfully delivered',
+                data: userList
+            });
+            
+        }catch(error){
+            //handle error response
+
+            const statusCode = error.statusCode || 500;
+            const message = error.message || 'An unexpected error has ocurred';
+
+            //send response to client
+            response
+            .status(statusCode)
+            .json({
+                status: 'Error',
+                error: {
+                    message: message
+                }
+            });
+        }
+    }
+);
 
 router.get('/failRegister', ()=> {
     const error = {};
@@ -160,5 +196,78 @@ router.patch('/premium/uid', authentication('authToken'), resetPasswordValidatio
         });
     }
 });
+
+router.delete(
+    '/inactivity', 
+    authentication('authToken'),
+    permission(['Master','Admin']),
+    async (request, response)=> {
+        try{
+
+            await userService.deleteUsersForInactivity();
+    
+            //send response to client
+            response
+            .status(200)
+            .json({
+                status: 'Success',
+                message: 'Inactive users have been deleted',
+            });
+            
+        }catch(error){
+            //handle error response
+
+            const statusCode = error.statusCode || 500;
+            const message = error.message || 'An unexpected error has ocurred';
+
+            //send response to client
+            response
+            .status(statusCode)
+            .json({
+                status: 'Error',
+                error: {
+                    message: message
+                }
+            });
+        }
+    }
+);
+
+router.delete(
+    '/:id', 
+    authentication('authToken'),
+    permission(['Master','Admin']),
+    async (request, response)=> {
+        try{
+
+            const userId = request.params.id;
+            console.log(userId);
+            //send response to client
+            response
+            .status(200)
+            .json({
+                status: 'Success',
+                message: 'Users successfully delivered',
+                data: userList
+            });
+            
+        }catch(error){
+            //handle error response
+
+            const statusCode = error.statusCode || 500;
+            const message = error.message || 'An unexpected error has ocurred';
+
+            //send response to client
+            response
+            .status(statusCode)
+            .json({
+                status: 'Error',
+                error: {
+                    message: message
+                }
+            });
+        }
+    }
+);
 
 export default router;

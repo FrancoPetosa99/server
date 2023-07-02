@@ -9,7 +9,7 @@ import { HTTPMethod } from '../middlewares/index.js';
 
 const routes = (app)=>  {
     app.use('/api/products', HTTPMethod(['GET', 'POST', 'PATCH', 'DELETE']), products);
-    app.use('/api/users', HTTPMethod(['GET', 'POST', 'PATCH']), users);
+    app.use('/api/users', HTTPMethod(['GET', 'POST', 'PATCH', 'DELETE']), users);
     app.use('/api/categories', HTTPMethod(['GET', 'POST', 'PATCH', 'DELETE']), categories);
     app.use('/api/carts', HTTPMethod(['GET', 'POST', 'PATCH', 'DELETE']), carts);
     app.use('/api/views', HTTPMethod(['GET']), views);

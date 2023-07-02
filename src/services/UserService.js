@@ -4,9 +4,10 @@ import CustomError from "../util/customError.js";
 import getTemplateString from '../templates/resetPassword.template.js'
 import transport from "../util/gmail.js";
 import jwtManager from "../util/jwt.js";
+import moment from "moment";
 
 class UserService{
-
+    
     constructor(){}
 
     async createNewUser(newUserData){
@@ -27,15 +28,12 @@ class UserService{
     }
 
     async createNewUserByThird(newUserData){
-        
         const userData = await userDB.createUser(newUserData);
-        
         return userData;
 
     }
 
     async checkEmailAndPassword(credentials){
-
         const { email, password } = credentials;
 
         const userData = await userDB.getUserByEmail(email);
@@ -96,7 +94,6 @@ class UserService{
     }
 
     async getUserDataById(id){
-
         const userData = await userDB.getUserDataById(id)
 
         if(!userData) throw new CustomError(404, `Could not found user with email ${email}`);
@@ -112,6 +109,20 @@ class UserService{
         if(user) userExist = true;
         
         return userExist;
+    }
+
+    async getUsers(){
+        const userList = await userDB.getUsers();
+        return userList;
+    }
+    async updateLastSession(email){
+        return userDB.updateLastSession(email);
+    }
+
+    async deleteUsersForInactivity(){
+        const limitTime = 48; //hours
+        const limitDate = moment().subtract(limitTime, 'hours').format('DD/MM/YYYY HH:mm');
+        return userDB.deleteUsersForInactivity(limitDate);
     }
 }
 

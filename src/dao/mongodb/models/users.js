@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import moment from 'moment';
 
 const collection = 'users';
 
@@ -30,6 +31,10 @@ const dataModelObj = {
     cartId: {
         ref: "carts",
         type: mongoose.Schema.Types.ObjectId
+    },
+    lastSessionDate: {
+        type: String,
+        default: moment().format('DD/MM/YYYY HH:mm')
     }
 };
 
