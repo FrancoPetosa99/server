@@ -1,7 +1,7 @@
 import { productDB } from "../dao/index.js";
 import CustomError from "../util/customError.js";
 import getTemplateString from "../templates/deleteProduct.template.js";
-import transport from "../util/gmail.js";
+import gmail from "../util/gmail.js";
 
 class ProductService{
 
@@ -127,11 +127,8 @@ class ProductService{
             subject: 'Product Deleted',
             html: templateString
         }
-
-        await transport.sendMail(emailConfig, (error)=> {
-            const { code, message } = error;
-            if(error) throw new CustomError(code, message);
-        });
+        
+        return gmail.sendEmail(emailConfig);
     }
 
     async getProductByCode(code){
