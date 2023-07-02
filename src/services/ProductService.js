@@ -1,5 +1,7 @@
-import { productDB, userDB } from "../dao/index.js";
+import { productDB } from "../dao/index.js";
 import CustomError from "../util/customError.js";
+import getTemplateString from "../templates/deleteProduct.template.js";
+import transport from "../util/gmail.js";
 
 class ProductService{
 
@@ -113,9 +115,23 @@ class ProductService{
         if(!product) throw new CustomError(404, `The product with code ${code} could not be found`);
 
         //if the user is premium must check that product belongs to him
-        if(role === 'Premium' && email !== product.owner) throw new CustomError(403, `Client does not have permission on this product`);
+        if(role === 'Premium' && product.owner && email !== product.owner) throw new CustomError(403, `Client does not have permission on this product`);
 
         await productDB.deleteByCode(code);
+
+        const templateString = getTemplateString(user, product);
+        
+        const emailConfig = {
+            from: 'coder40305@gmail.com',
+            to: product.owner,
+            subject: 'Product Deleted',
+            html: templateString
+        }
+
+        await transport.sendMail(emailConfig, (error)=> {
+            const { code, message } = error;
+            if(error) throw new CustomError(code, message);
+        });
     }
 
     async getProductByCode(code){

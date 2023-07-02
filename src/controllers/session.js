@@ -140,13 +140,4 @@ router.post('/', signInValidation, async (request, response)=> {
     }
 });
 
-
-/********************************************/
-//PUT METHOD ENDPOINTS
-/********************************************/
-
-/********************************************/
-//DELETE METHOD ENDPOINTS
-/********************************************/
-
 export default router;

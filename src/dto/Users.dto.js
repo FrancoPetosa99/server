@@ -14,7 +14,6 @@ class UserDTO{
     }
 
     public(user){
-        console.log(user);
         const userDTO = {};
         userDTO.firstName = user.firstName;
         userDTO.lastName = user.lastName;
@@ -26,6 +25,8 @@ class UserDTO{
 
     token(user){
         const userDTO = {};
+        userDTO.firstName = user.firstName;
+        userDTO.lastName = user.lastName;
         userDTO.email = user.email;
         userDTO.role = user.role;
         userDTO.active = user.active;

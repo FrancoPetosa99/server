@@ -1,7 +1,7 @@
 /********************************************/
 //IMPORT MODULES
 /********************************************/
-import { Router, request, response } from "express";
+import { Router } from "express";
 import userService from "../services/UserService.js";
 import userDTO from "../dto/Users.dto.js";
 import jwtManager from "../util/jwt.js";
