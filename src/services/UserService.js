@@ -2,7 +2,7 @@ import { userDB, cartDB } from "../dao/index.js";
 import encrypt from "../util/encrypt.js";
 import CustomError from "../util/customError.js";
 import getTemplateString from '../templates/resetPassword.template.js'
-import transport from "../util/gmail.js";
+import gmail from "../util/gmail.js";
 import jwtManager from "../util/jwt.js";
 import moment from "moment";
 
@@ -68,7 +68,7 @@ class UserService{
 
     async sendResetPasswordEmail(user){
         const { email, firstName, lastName } = user;
-        const token = jwtManager.generateToken({email: email}, '60m');
+        const token = jwtManager.generateToken({email: email}, '5m');
         const templateString = getTemplateString({firstName, lastName}, `http://localhost:8080/api/views/changePassword/${token}`);
         
         const emailConfig = {
@@ -78,10 +78,7 @@ class UserService{
             html: templateString
         }
 
-        return transport.sendMail(emailConfig, (error)=> {
-            const { code, message } = error;
-            if(error) throw new CustomError(code, message);
-        });
+        return gmail.sendEmail(emailConfig);
     }
 
     async getUserByEmail(userEmail){
