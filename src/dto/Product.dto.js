@@ -18,6 +18,18 @@ class ProductDTO{
 
         return productDTO;
     }
+
+    orderItems(cart){
+        return cart.products.map(item => {
+            const { title, price, amount } = item.product;
+            const orderItem = {};
+            orderItem.title = title;
+            orderItem.unit_price = price;
+            orderItem.currency_id = 'ARS';
+            orderItem.quantity = item.amount;
+            return orderItem;
+        });
+    }
 }
 
 const productDTO = new ProductDTO(); //INITIALIZE USER DTO

@@ -14,7 +14,9 @@ const {
     SERVICE_EMAIL,
     SERVICE_EMAIL_PORT,
     GMAIL_USER,
-    GMAIL_PASSWORD } = process.env;
+    GMAIL_PASSWORD,
+    STRIPE_PRIVATE_KEY,
+    MP_ACCESS_TOKEN } = process.env;
 
 export {
     NODE_ENV,
@@ -25,5 +27,7 @@ export {
     SERVICE_EMAIL,
     SERVICE_EMAIL_PORT,
     GMAIL_USER,
-    GMAIL_PASSWORD
+    GMAIL_PASSWORD,
+    STRIPE_PRIVATE_KEY,
+    MP_ACCESS_TOKEN
 };

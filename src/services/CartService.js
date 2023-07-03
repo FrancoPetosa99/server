@@ -49,7 +49,7 @@ class CartService{
         const cart = await cartDB.getById(cartId);
         
         //check there are products in cart
-        if(cart.products.length == 0) throw new CustomError(400, 'Purchase process is not allow when cart is empty');
+        if(cart.products.length == 0) throw new CustomError(400, 'Cart is empty');
 
         //collect products with enough stock to complete purchase process
         const availableProducts = cart.products.filter(product => product.product.stock >= product.amount);

@@ -1,4 +1,3 @@
-import CustomError from "../util/customError.js";
 import { ticketDB } from "../dao/index.js";
 import UUID from '../util/UUID.js'
 
@@ -25,7 +24,6 @@ class TicketService{
     }
     
 }
-
 
 const ticketService = new TicketService();
 

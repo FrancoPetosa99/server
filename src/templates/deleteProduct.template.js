@@ -13,7 +13,7 @@ function getTemplateString(user, product){
             <body>
                 <h1>Product Deleted</h1>
                 <p>Hello ${firstName} ${lastName},</p>
-                <p>We would like to inform you that the product ${title} has been removed from our inventory and is no longer available for purchase.</p>
+                <p>We would like to inform you that the product <b>${title}</b> has been removed from our inventory and is no longer available for purchase.</p>
                 <p>If you have any questions or need further assistance, please feel free to contact our support team.</p>
                 <p>Thank you for your understanding.</p>
                 <p>Best regards,</p>
