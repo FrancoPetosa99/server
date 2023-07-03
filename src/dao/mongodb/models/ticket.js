@@ -16,7 +16,10 @@ const dataModelObj = {
         ]
     },
     total: mongoose.Schema.Types.Decimal128,
-    purchaser: String
+    purchaser: String,
+    card_holder: String,
+    pay_holder: String,
+    payment_type: String
 };
 
 const schemaConfigObj = {

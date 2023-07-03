@@ -1,4 +1,4 @@
-import mercadopago  from 'mercadopago';
+import mercadopago from 'mercadopago';
 import { MP_ACCESS_TOKEN } from '../config/env.config.js';
 
 class PaymentService {
@@ -11,18 +11,21 @@ class PaymentService {
     }
 
     async createOrder(products){
-        const order = {};
-        order.items = products;
-        order.back_urls = {
-            success: '',
-            failure: '',
-            pending: ''
-        }
-        order.notification_url = 'https://e62b-186-137-136-245.ngrok-free.app/api/payments/webhook';
-        const result = await this.mp.preferences.create(order);
-        console.log('BODY:', result.body.init_point);
-        console.log('BODY:', result.body.notification_url);
+       return this.mp.preferences.create({
+            items: products,
+            back_urls: {
+                success: '',
+                failure: '',
+                pending: ''
+            },
+            notification_url: 'https://9826-186-137-136-245.ngrok-free.app/api/payments/webhook',
+            external_reference: 'TESTIDFRANCO'
+       });
+    }
 
+    async getPaymentData(paymentId){
+        const paymentData = await this.mp.payment.findById(paymentId);
+        return paymentData;
     }
     
 }
