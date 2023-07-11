@@ -88,6 +88,29 @@ class CartService{
         };
     }
 
+    async reserveProducts(products){
+        const availableProducts = []; //collect products with enough stock to complete purchase process
+        const unavailableProducts = []; //collect products with enough stock to complete purchase process
+
+        products.forEach(product => {
+            if(product.product.stock >= product.amount) availableProducts.push(product)
+            else unavailableProducts.push(product);
+        });
+        
+        //update stock of products. If an error occurs on one product process still runs
+        await Promise.all(availableProducts.map(product => {
+            const { code, stock } = product.product;
+            const { amount } = product;
+            const newStock = stock - amount;
+
+            return productDB.updateStock(code, newStock);
+        }));
+
+        return {
+            availableProducts,
+            unavailableProducts
+        };
+    }
 }
 
 

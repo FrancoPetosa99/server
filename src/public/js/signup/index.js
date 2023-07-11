@@ -11,7 +11,6 @@ const formInputs = document.querySelectorAll('.input');
 /********************************************/
 //GLOBAL VARIABLES
 /********************************************/
-const  baseURL = window.location.origin;
 
 /********************************************/
 //HELPER FUNCTIONS
@@ -19,7 +18,7 @@ const  baseURL = window.location.origin;
 
 async function signUp(newUserObj){
 
-    const response = await fetch(`${baseURL}/api/users`, {
+    const response = await fetch('/api/users', {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",
@@ -45,7 +44,7 @@ function handleAPIResonse(statusCode, data){
         alert.type = 'success';
         alert.title = 'Welcome';
         alert.message = data.message;
-        setTimeout(()=> window.location.href = `${baseURL}/api/views/logging`, 1500);
+        setTimeout(()=> window.location.href = '/api/views/logging', 1500);
     }
 
     ui.displayAlert(alert.type, alert.message, alert.title);

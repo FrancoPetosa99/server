@@ -55,35 +55,6 @@ router.get('/home', async (request, response)=> {
     }
 });
 
-router.get('/realtimeproducts', async (request, response)=> {
-    
-    const products = await productService.getProducts();
-    
-    //sort products by id ASC
-    const sortedList = products.sort((x, y) => x.id - y.id);
-   
-    const renderObj = {
-        products: sortedList
-    }
-    
-    response.render('realTimeProducts2', renderObj);
-
-});
-
-router.get('/pagination', async (request, response)=> {
-    try{
-        const renderObj = {
-            title: 'Pagination',
-            cssFileName: 'pagination.css',
-        };
-    
-        response.render('pagination', renderObj);
-        
-    }catch(error){
-        response.send(`<h1>The following error has occurred: ${error.message}</h1>`);
-    }
-});
-
 router.get('/product', async (request, response)=> {
     try{
 
@@ -127,7 +98,7 @@ router.get('/product', async (request, response)=> {
     }
 });
 
-router.get('/cart', async (request, response)=> {
+router.get('/checkout', async (request, response)=> {
     try{
         const renderObj = {
             title: 'Check-out',

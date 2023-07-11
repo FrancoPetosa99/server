@@ -10,7 +10,7 @@ class PaymentService {
         });
     }
 
-    async createOrder(products){
+    async createOrder(products, cartId){
        return this.mp.preferences.create({
             items: products,
             back_urls: {
@@ -18,14 +18,13 @@ class PaymentService {
                 failure: '',
                 pending: ''
             },
-            notification_url: 'https://9826-186-137-136-245.ngrok-free.app/api/payments/webhook',
-            external_reference: 'TESTIDFRANCO'
+            notification_url: 'https://ed79-186-137-136-245.ngrok-free.app/api/payments/webhook',
+            external_reference: cartId
        });
     }
 
-    async getPaymentData(paymentId){
-        const paymentData = await this.mp.payment.findById(paymentId);
-        return paymentData;
+    async getPaymentById(paymentId){
+        return this.mp.payment.findById(paymentId);
     }
     
 }

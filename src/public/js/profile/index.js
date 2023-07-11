@@ -15,18 +15,17 @@ const userBirthdate = document.getElementById('user-birthdate')
 /********************************************/
 //GLOBAL VARIABLES
 /********************************************/
-const  baseURL = window.location.origin;
 
 /********************************************/
 //HELPER FUNCTIONS
 /********************************************/
 async function getUserData(){
-    return fetch(`${baseURL}/api/session/current`)
+    return fetch('/api/session/current')
     .then((res)=> res.json());
 }
 
 function logOut(){
-    fetch(`${baseURL}/api/session/logout`)
+    fetch('/api/session/logout')
     .then((res)=> res.json())
     .then((data)=> ui.displayAlert('success', data.message))
     .then(setTimeout(()=> window.location.href = `${baseURL}/api/views/logging`, 1000))

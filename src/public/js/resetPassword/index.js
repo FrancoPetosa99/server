@@ -11,7 +11,6 @@ const formResetPassword = document.getElementById('resetPasswordForm');
 /********************************************/
 //GLOBAL VARIABLES
 /********************************************/
-const  baseURL = window.location.origin;
 
 /********************************************/
 //HELPER FUNCTIONS
@@ -20,7 +19,7 @@ async function resetPassword(newUserObj){
     
     ui.handleBtnLoading();
 
-    const response = await fetch(`${baseURL}/api/users/passwordResetEmail`, {
+    const response = await fetch('/api/users/passwordResetEmail', {
         method: 'POST',
         headers: {
             "Content-Type": "application/json",

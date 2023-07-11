@@ -12,7 +12,6 @@ const inputEmail = document.getElementById('input-email');
 /********************************************/
 //GLOBAL VARIABLES
 /********************************************/
-const  baseURL = window.location.origin;
 
 /********************************************/
 //HELPER FUNCTIONS
@@ -26,7 +25,7 @@ async function login(email, password){
     bodyRequest.email = email;
     bodyRequest.password = password;
 
-    return fetch(`${baseURL}/api/session`, {
+    return fetch('/api/session', {
         method: httpMethod,
         headers: {
             "Content-Type": "application/json",
@@ -48,7 +47,7 @@ function handleAPIResponse(statusCode, data){
     }else{
         alert.type = 'success';
         alert.message = data.message;
-        setTimeout(()=> window.location.href = `${baseURL}/api/views/home`, 1500);
+        setTimeout(()=> window.location.href = '/api/views/home', 1500);
     }
 
     ui.displayAlert(alert.type, alert.message);
@@ -79,11 +78,4 @@ btnLogin.addEventListener('click', async ()=> {
     }catch(error){
         ui.displayAlert('error', 'Ups! Something went wrong. Please try again later. ');
     }
-});
-
-//handle input validation on blur event
-[inputEmail, inputPassword].forEach(input => {
-    input.addEventListener('blur', (e)=> {
-        
-    });
 });

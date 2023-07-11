@@ -26,7 +26,7 @@ class ProductDTO{
             orderItem.title = title;
             orderItem.unit_price = price;
             orderItem.currency_id = 'ARS';
-            orderItem.quantity = item.amount;
+            orderItem.quantity = amount;
             return orderItem;
         });
     }
