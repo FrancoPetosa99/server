@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 //SET COLLECTION NAME
-const collection = 'ticket';
+const collection = 'payments';
 
 //DEFINE MODEL STRUCTURE
 const dataModelObj = {
@@ -11,12 +11,17 @@ const dataModelObj = {
             {
                 title: String,
                 price: mongoose.Schema.Types.Decimal128,
-                amount: Number
+                amount: Number,
+                subTotal: mongoose.Schema.Types.Decimal128
             }
         ]
     },
     total: mongoose.Schema.Types.Decimal128,
-    purchaser: String,
+    purchaser: {
+        name: String,
+        lastName: String,
+        identification: Number
+    },
     card_holder: String,
     pay_holder: String,
     payment_type: String

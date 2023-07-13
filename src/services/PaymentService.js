@@ -1,3 +1,4 @@
+import { paymentDB } from '../dao/index.js';
 import mercadopago from 'mercadopago';
 import { MP_ACCESS_TOKEN } from '../config/env.config.js';
 
@@ -18,13 +19,17 @@ class PaymentService {
                 failure: '',
                 pending: ''
             },
-            notification_url: 'https://ed79-186-137-136-245.ngrok-free.app/api/payments/webhook',
+            notification_url: 'https://ab1d-186-137-136-245.ngrok-free.app/api/payments/webhook',
             external_reference: cartId
        });
     }
 
     async getPaymentById(paymentId){
         return this.mp.payment.findById(paymentId);
+    }
+
+    async createPayment(payment){
+        return paymentDB.createPayment(payment);
     }
     
 }

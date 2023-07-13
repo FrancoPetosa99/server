@@ -19,9 +19,10 @@ class ProductDTO{
         return productDTO;
     }
 
-    orderItems(cart){
-        return cart.products.map(item => {
-            const { title, price, amount } = item.product;
+    orderItems(products){
+        return products.map(item => {
+            const { amount } = item;
+            const { title, price } = item.product;
             const orderItem = {};
             orderItem.title = title;
             orderItem.unit_price = price;

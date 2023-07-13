@@ -41,75 +41,36 @@ class CartService{
         }
     }
 
-    async purchase(cartId){
-        const errorLog = [];
-        const purchasedList = [];
-
-        //get cart from db
-        const cart = await cartDB.getById(cartId);
+    async reserveProducts(products){
+        //check cart is not empty
+        if(products.length == 0) throw new CustomError(400, 'Cart is empty');
         
-        //check there are products in cart
-        if(cart.products.length == 0) throw new CustomError(400, 'Cart is empty');
+        const purchasedList = [];
+        const unpurchasedList = [];
 
         //collect products with enough stock to complete purchase process
-        const availableProducts = cart.products.filter(product => product.product.stock >= product.amount);
-        
-        //update stock of products. If an error occurs on one product process still runs
-        await Promise.all(availableProducts.map(product => {
-            const { title, price, code, stock } = product.product;
-            const { amount } = product;
-
-            return productDB.updateStock(code, stock - amount)
-            .then(() => {
-                //if stock was updated, add it to purchased list and remove it from the cart
-                purchasedList.push({ title, price, amount });
-                const index = cart.products.findIndex(product => product.product.code == code);
-                if (index >= 0) cart.products.splice(index, 1);
-            })
-            .catch((error)=> {
-                errorLog.push(error.message);
-            });
-        }));
-
-        //record errors on logger
-        if(errorLog.length > 0){
-            //implementar logger
-            const error = errorLog.join('; ')
-            console.log(error);
-        }
-
-        //update products on cart
-        const unpurchasedList = cart.products;
-        await cartDB.updateProducts(cartId, unpurchasedList);
-    
-        return {
-            purchasedList,
-            unpurchasedList
-        };
-    }
-
-    async reserveProducts(products){
-        const availableProducts = []; //collect products with enough stock to complete purchase process
-        const unavailableProducts = []; //collect products with enough stock to complete purchase process
-
-        products.forEach(product => {
-            if(product.product.stock >= product.amount) availableProducts.push(product)
-            else unavailableProducts.push(product);
-        });
+        const availableProducts = products.filter(product => product.product.stock >= product.amount);
         
         //update stock of products. If an error occurs on one product process still runs
         await Promise.all(availableProducts.map(product => {
             const { code, stock } = product.product;
             const { amount } = product;
-            const newStock = stock - amount;
 
-            return productDB.updateStock(code, newStock);
+            return productDB.updateStock(code, stock - amount)
+            .then((result) => {
+                if(result == 'Success') purchasedList.push(product)
+            })
+            .catch(()=> unpurchasedList.push(product));
         }));
 
         return {
-            availableProducts,
-            unavailableProducts
-        };
+            purchasedList,
+            unpurchasedList
+        }
+    }
+
+    async emptyCart(cartId){
+        return cartDB.updateProducts(cartId, []);
     }
 }
 

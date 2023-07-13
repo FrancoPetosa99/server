@@ -7,11 +7,11 @@
 import userDB from "./mongodb/Users.mongodb.js";
 import cartDB from "./mongodb/Carts.mongodb.js";
 import productDB from "./mongodb/Products.mongodb.js";
-import ticketDB from "./mongodb/Ticket.mongodb.js";
+import paymentDB from "./mongodb/Payments.mongodb.js";
 
 export {
     userDB,
     cartDB,
     productDB,
-    ticketDB
+    paymentDB
 };
