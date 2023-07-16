@@ -98,6 +98,16 @@ router.get('/product', async (request, response)=> {
     }
 });
 
+router.get('/product/create', privateAccess(['Admin', 'Master', 'Premium']),async (request, response)=> {
+    const renderObj = {
+        title: 'Create Product',
+        cssFileName: 'productCreate.css',
+    };
+
+    response
+    .render('productCreate', renderObj)
+});
+
 router.get('/checkout', async (request, response)=> {
     try{
         const renderObj = {
@@ -142,7 +152,7 @@ router.get('/signup', publicAccess, async (request, response)=> {
     }
 });
 
-router.get('/profile', privateAccess, async (request, response)=> {
+router.get('/profile', privateAccess(), async (request, response)=> {
     try{
 
         const renderObj = {

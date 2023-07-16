@@ -81,14 +81,16 @@ router.post(
             const user = request.user;
             const newProductData = productDTO.newProduct(request.body, user);
             const newProduct = await productService.createNew(newProductData);
-            response.json(201, `product with id ${newProduct.id} was successfully added`);
 
             //send response to client
             response
             .status(201)
             .json({
                 status: 'Success',
-                message: 'Product successfully created'
+                message: 'Product successfully created',
+                data: {
+                    newProduct: newProduct
+                }
             });
 
         }catch(error){
