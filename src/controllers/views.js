@@ -102,6 +102,8 @@ router.get('/product/create', privateAccess(['Admin', 'Master', 'Premium']),asyn
     const renderObj = {
         title: 'Create Product',
         cssFileName: 'productCreate.css',
+        isAuthenticated: true,
+        userEmail: request.user.email
     };
 
     response

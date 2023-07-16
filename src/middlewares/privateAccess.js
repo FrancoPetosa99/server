@@ -12,15 +12,19 @@ function privateAccess(roles){
             if(isTokenValid){
                 if(roles){
                     //check the client has permissions
-                    const { role } = jwtManager.parseToken(authToken);
-                    const isRoleValid = roles.includes(role);
+                    const user = jwtManager.parseToken(authToken);
+                    const isRoleValid = roles.includes(user.role);
 
-                    const renderObj = {
-                        title: 'Denied Access',
-                        cssFileName: 'deniedAccess.css',
-                    };
+                    if(!isRoleValid) {
+                        const renderObj = {
+                            title: 'Denied Access',
+                            cssFileName: 'deniedAccess.css',
+                        };
+                        
+                        return response.render('deniedAccess', renderObj);
+                    }
 
-                    if(!isRoleValid) return response.render('deniedAccess', renderObj);
+                    request.user = user;
                 }
 
                 return next();
