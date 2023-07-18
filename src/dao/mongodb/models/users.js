@@ -35,6 +35,10 @@ const dataModelObj = {
     lastSessionDate: {
         type: String,
         default: moment().format('DD/MM/YYYY HH:mm')
+    },
+    profilePicture: {
+        data: Buffer,
+        contentType: String
     }
 };
 

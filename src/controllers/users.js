@@ -7,7 +7,7 @@ import userDTO from "../dto/Users.dto.js";
 import jwtManager from "../util/jwt.js";
 import signUpValidation from "../middlewares/signUpValidation.js";
 import CustomError from "../util/customError.js";
-import { authentication, resetPasswordValidation, permission } from "../middlewares/index.js";
+import { authentication, resetPasswordValidation, permission, fileHandler } from "../middlewares/index.js";
 
 const router = Router(); //INITIALIZE ROUTER
 
@@ -113,6 +113,37 @@ router.post('/passwordResetEmail', async (request, response)=> {
             status: 'Success',
             message: 'Password successfully updated'
         });
+    }catch(error){
+        //handle error response
+
+        const statusCode = error.statusCode || 500;
+        const message = error.message || 'An unexpected error has ocurred';
+
+        //send response to client
+        response
+        .status(statusCode)
+        .json({
+            status: 'Error',
+            error: {
+                message: message
+            }
+        });
+    }
+});
+
+router.post('/profile/picture', authentication('authToken'), fileHandler('profiles'), async (request, response)=> {
+    try{
+
+        console.log(request.file);
+
+        //send response to client
+        response
+        .status(200)
+        .json({
+            status: 'Success',
+            message: 'Profile picture successfully uploaded'
+        });
+
     }catch(error){
         //handle error response
 
